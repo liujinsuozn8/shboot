@@ -23,7 +23,7 @@ USAGE
 }
 
 #----------------------------
-# static paramter & init
+# static paramter
 #----------------------------
 SHELL_EXEC_DIR=$(pwd)
 LOG_DATE="on"
@@ -34,18 +34,14 @@ LOG_DATE="on"
 . ./bin/logger.sh
 
 #----------------------------
-# public paramter
-#----------------------------
-
-#----------------------------
 # function
 #----------------------------
 
 #----------------------------
-# main
+# param
 #----------------------------
-
-# param analyze
+# 1. param define
+# 2. param analyze
 while [ $# -gt 0 ];do
     case "$1" in
         --help)
@@ -65,10 +61,9 @@ logerr "$SHELL_EXEC_DIR"
 
 
 #----------------------------
-# memos
+# main
 #----------------------------
-# IFS=$(echo -en "\n\b")
-# : $((n = $n + 1))
-# echo $((n = $n + 1))
-# for line in ${xxx[@]};do
-# for (( i=0; i<${count}; i++));do
+# 1. process1
+# 2. process2
+# .....
+# n. processn
