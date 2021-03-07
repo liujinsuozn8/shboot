@@ -10,15 +10,12 @@
 # Usage:
 #   1. evn setting of logger.sh
 #       LOG_FILE="....."
-#       LOG_DATE="on"
 #   2. import logger.sh
 #       . ./bin/logger.sh
 #
 # Setting:
-#   NO setting  :"[xxxxxx]:...."
-#   LOG_DATE    :"yyyy-mm-dd HH:MM:SS [xxxxxx]:...."
-#   LOG_FILE    :"[xxxxxx]:...." >> <filepath>
-#   LOG_DATE + LOG_FILE :"yyyy-mm-dd HH:MM:SS [xxxxxx]:...." >> <filepath>
+#   NO setting  :"yyyy-mm-dd HH:MM:SS [xxxxxx]:...."
+#   LOG_FILE    :"yyyy-mm-dd HH:MM:SS [xxxxxx]:...." >> <filepath>
 #
 # Available Function:
 #   loginfo
@@ -30,66 +27,45 @@
 #----------------------------
 # import check
 #----------------------------
-if [ -n "${___MODULE_ECHOLOG___}" ];then
+if [ -n "$___MODULE_BIN_LOGGER___" ];then
     return
 fi
 
-___MODULE_LOGGER___="logger.sh"
+___MODULE_BIN_LOGGER___='bin/logger.sh'
 
 #----------------------------
-# main
+# import other
 #----------------------------
-if [ "${LOG_DATE}" = 'on' ] && [ -n "${LOG_FILE}" ];then
+# none
+
+#----------------------------
+# main-function
+#----------------------------
+if [ -n "$LOG_FILE" ];then
     # 1. LOG_DATE + LOG_FILE
     loginfo(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [ INFO ]:$@" >> ___LOG_FILE___
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [ INFO ]:$@" >> ___LOG_FILE___
     }
 
     logerr(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [ERROR ]:$@" >> ___LOG_FILE___
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [ERROR ]:$@" >> ___LOG_FILE___
     }
 
     logwarn(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [WARING]:$@" >> ___LOG_FILE___
-    }
-elif [ "${LOG_DATE}" = 'on' ];then
-    # 2. LOG_DATE
-    loginfo(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [ INFO ]:$@"
-    }
-
-    logerr(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [ERROR ]:$@" 1>&2
-    }
-
-    logwarn(){
-        echo "$(date +'%Y-%m-%d %H:%M:%S') [WARING]:$@"
-    }
-elif [ -n "${LOG_FILE}" ];then
-    # 3. LOG_FILE
-    loginfo(){
-        echo "[ INFO ]:$@" >> LOG_FILE
-    }
-
-    logerr(){
-        echo "[ERROR ]:$@" >> LOG_FILE
-    }
-
-    logwarn(){
-        echo "[WARING]:$@" >> LOG_FILE
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [WARING]:$@" >> ___LOG_FILE___
     }
 else
-    # 4. NO setting
+    # 2. LOG_DATE
     loginfo(){
-        echo "[ INFO ]:$@"
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [ INFO ]:$@"
     }
 
     logerr(){
-        echo "[ERROR ]:$@"
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [ERROR ]:$@" 1>&2
     }
 
     logwarn(){
-        echo "[WARING]:$@"
+        echo "`date +'%Y-%m-%d %H:%M:%S'` [WARING]:$@"
     }
 fi
 

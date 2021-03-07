@@ -26,7 +26,6 @@ USAGE
 # static paramter
 #----------------------------
 SHELL_EXEC_DIR=$(pwd)
-LOG_DATE="on"
 
 #----------------------------
 # import
