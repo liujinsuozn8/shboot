@@ -34,12 +34,12 @@ fi
 ___MODULE_BIN_LOGGER___='bin/logger.sh'
 
 #----------------------------
-# import other
+# import others
 #----------------------------
 # none
 
 #----------------------------
-# main-function
+# function
 #----------------------------
 if [ -n "$LOG_FILE" ];then
     # 1. LOG_DATE + LOG_FILE
@@ -74,3 +74,8 @@ errend(){
     logerr "shell end, exit code: $1"
     exit $1
 }
+
+#----------------------------
+# main
+#----------------------------
+# none

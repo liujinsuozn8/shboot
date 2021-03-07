@@ -25,12 +25,12 @@ USAGE
 #----------------------------
 # static paramter
 #----------------------------
-SHELL_EXEC_DIR=$(pwd)
+export EXEC_ROOT="$(cd `dirname $0`;pwd)"
 
 #----------------------------
 # import
 #----------------------------
-. ./bin/logger.sh
+. "${EXEC_ROOT}/logger.sh"
 
 #----------------------------
 # function
