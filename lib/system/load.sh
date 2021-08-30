@@ -1,9 +1,9 @@
-___boot___=$( cd ${BASH_SOURCE[0]%/*}/../.. && pwd )
+declare -g PROJECT_ROOT=$( cd ${BASH_SOURCE[0]%/*}/../.. && pwd )
 
-source "${___boot___}/lib/system/env/env.sh"
-source "${___boot___}/lib/system/builtin/path.sh"
-source "${___boot___}/lib/system/builtin/array.sh"
-source "${___boot___}/lib/system/exception/exception.sh"
+source "${PROJECT_ROOT}/lib/system/env/env.sh"
+source "${PROJECT_ROOT}/lib/system/builtin/path.sh"
+source "${PROJECT_ROOT}/lib/system/builtin/array.sh"
+source "${PROJECT_ROOT}/lib/system/exception/exception.sh"
 
 # Load import function to environment
-source "${___boot___}/lib/system/import/import.sh"
+source "${PROJECT_ROOT}/lib/system/import/import.sh"

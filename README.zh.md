@@ -20,3 +20,18 @@
 |String::Trim|trim whitespace|String::Trim ' xxx '|lib/string/base.sh|
 |String::StartsWith|trim whitespace|if String::StartsWith "$a" "$b"|lib/string/base.sh|
 
+
+# 日志
+- 日志级别关系
+    ```
+    DEBUG < INFO < WARN < ERROR < FATAL
+    ```
+- 日志信息中可用的参数
+    - `${time}`, 日期
+    - `${level}`, 日志级别
+    - `${shell}`, 执行输出日志操作的 shell 名
+    - `${method}`, 执行输出日志操作的 method 名
+    - `${msg}'`, 日志内容
+
+# 内置变量
+- PROJECT_ROOT，当前工程的根目录

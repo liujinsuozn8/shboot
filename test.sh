@@ -1,85 +1,46 @@
 
-
-# regex 'aaa.sss = ssxs = dd' '([^ =]*) = .*'
-# . ./test02.sh
-# . ./test03.sh
-
-# a='12345'
-# echo ${a:2}
-
-# declare -g __oo__fdPath=$(dirname <(echo))
-# declare -gi __oo__fdLength=$(( ${#__oo__fdPath} + 1 ))
-# echo $__oo__fdPath
-# echo $__oo__fdLength
-
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
-import string/base
+# import log/base
+# LogAppenderRegistry 'ma' 'Console' -logPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='DEBUG'
+# Log::DEBUG 'testmsg2'
+# Log::INFO 'testmsg3'
 
-# String::Trim '  dd dsss'
-
-# appenders
-# rotter 
-# threshold
-# logPattern
-# filename
-# 
-# filePattern
-#
-
-# declare -Ag __log__appenders
-
-# Log::Appenders
-
-#####################
-# echo $___boot___
-
-# appenderName='a'
-# a_pattern='1234'
+import string/regex
+a='${time}{%Y/%m/%d %H:%M:%S} [${level}]'
+Regex::Matcher "$a" '(\$\{time\}[^\}]*\}).*' 1
+b=$(Regex::Matcher "$a" 'ssss')
+if [ -z "$b" ];then
+  echo 'empty'
+fi
+############################################################
+#appender.stdout = Console
+#appender.stdout.Target = STDERR
+#appender.stdout.Threshold = DEBUG
+#appender.stdout.LogPattern = ${time}{%Y/%m/%d %H:%M:%S} [${level}] Method:[${shell}--${method}] msg:${msg}
+#appender.stdout.LogTimeFormat = %Y/%m/%d %H:%M:%S
 
 
-# x=1
-# echo $x
+#appender.D = FileAppender
+#appender.D.Target = E://logs/log.log
+#appender.D.Append = true
+#appender.D.Threshold = DEBUG
+#appender.D.logPattern = ''
+#appender.D.timeFormat = ''
 
-# eval "x=\${___log_appender_${appenderName}['pattern']}"
-# echo $x
-#####################
 
-__console__Logger(){
-  local appenderName="$1"
-  local msg="$2"
-  eval "local innerAppenderName=___log_appender_${appenderName}"
-  eval "logPattern=\${${innerAppenderName}['pattern']}"
+#abc(){
+#  echo ${FUNCNAME[@]}
+#}
 
-  echo $logPattern $msg
-}
+#cde(){
+#  abc
+#  echo ${BASH_SOURCE[@]} ${FUNCNAME[-1]}
+#}
 
-declare -Ag __log_appender
 
-LoggerRegistry(){
-  # __log_appender["$1"]="$2"
-  appenderName="$1"
-  logPattern="$2"
 
-  innerAppenderName="___log_appender_${appenderName}"
-  eval "declare -Ag $innerAppenderName"
-  eval "${innerAppenderName}['pattern']=${logPattern}"
-}
 
-LoggerRegistry 'ma' 'mypattern'
-# __console__Logger 'ma' 'testmsg'
-
-printf '[%-5s]\n' 'qq'
-
-abc(){
-  echo ${FUNCNAME[@]}
-}
-
-cde(){
-  abc
-  echo ${BASH_SOURCE[@]} ${FUNCNAME[-1]}
-}
-cde
 # CreateConsoleLogAppender "ma" "mypattern"
 # # CreateConsoleLogAppender 'ma'
 # LoggerRegistry 'ma' __console__Logger_ma
@@ -92,3 +53,7 @@ cde
 # -->
 # for rootLogger
 #
+
+####################################################
+# ----- task -----
+# bash version compare 

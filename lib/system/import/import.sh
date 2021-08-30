@@ -104,7 +104,7 @@ System::ImportOne() {
   System::SourcePath "${__boot__libPath}/${libPath}" "$@" || \
   System::SourcePath "${__boot__path}/${libPath}" "$@" || \
   System::SourcePath "${requestedPath}" "$@" || \
-  System::SourcePath "${libPath}" "$@" || e="Cannot import $libPath" throw
+  System::SourcePath "${libPath}" "$@" || throw "Cannot import $libPath"
 }
 
 System::Import() {
