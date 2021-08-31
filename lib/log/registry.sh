@@ -1,3 +1,5 @@
+import string/regex
+import array/base
 ################################################################
 # log level
 declare -Ag Log__LevelStr
@@ -27,14 +29,29 @@ declare -g Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 # registry appender
 declare -ig Log_Root_Level=DEBUG
 declare -ag Log_Global_Appender
+################################################################
+# common
+__extract_timeFormat() {
+  # Usage:  __extract_timeFormat logPattern
 
+  # Extract time format string
+  # 1. 'xxx ${time:0:23}{%Y/%m/%d %H:%M:%S} xxxxx' -----> ${time}{%Y/%m/%d %H:%M:%S}
+  local timeConfig=$(Regex::Matcher "$1" '.*(\$\{time[^\{\}]*\}\{[^\{\}]*\}).*' 1)
+  if [ ! -z "$timeConfig" ]; then
+    # 2. ${time:0:23}{%Y/%m/%d %H:%M:%S} -----> %Y/%m/%d %H:%M:%S
+    local logTimeFormat=$(Regex::Matcher "$timeConfig" '\$\{time[^\{\}]*\}\{([^\{\}]*)\}' 1)
+    echo "$logTimeFormat"
+  fi
+}
+
+################################################################
 LogAppenderRegistry_FileAppender(){
   # Usage LogAppenderRegistry_FileAppender appenderName innerAppenderName settings
-#appender.D.Target = E://logs/log.log
-#appender.D.Append = true
-#appender.D.Threshold = DEBUG
-#appender.D.logPattern = ''
-#appender.D.timeFormat = ''
+	#appender.D.Target = E://logs/log.log
+	#appender.D.Append = true
+	#appender.D.Threshold = DEBUG
+	#appender.D.logPattern = ''
+	#appender.D.timeFormat = ''
 
 
   local appenderName="$1"
@@ -63,10 +80,6 @@ LogAppenderRegistry_FileAppender(){
       -logPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-      ;;
-      -logTimeFormat=*)
-        logTimeFormat="${1#*=}"
-        [ -z "$logTimeFormat" ] && throw "LogAppender [${appenderName}]: LogTimeFormat is empty"
       ;;
       *)
         throw "LogAppender ${appenderName}: Illegal parameter: $1"
@@ -140,17 +153,22 @@ LogAppenderRegistry_Console(){
     eval ${innerAppenderName}['threshold']=\$threshold
   fi
 
-  if [ -z "$logPattern" ]; then
-    eval ${innerAppenderName}['logPattern']="\$Log__DefalutLogPattern"
+  # Set default value if logPattern is empty
+  logPattern=${logPattern-$Log__DefalutLogPattern}
+  
+  # Extract time format string
+  local logTimeFormat="$(__extract_timeFormat $logPattern)"
+  if [ -z "$logTimeFormat" ]; then
+    # Set default value if logPattern does not contain time format string
+	  logTimeFormat=${logTimeFormat-$Log__DefalutLogTimeFormat}
   else
-    eval ${innerAppenderName}['logPattern']="\$logPattern"
+    # If timeconfig exists, replace it with empty string
+    # 'xxx ${time}{%Y/%m/%d %H:%M:%S} xxxxx' -----> 'xxx ${time} xxxxx'
+    logPattern=${logPattern/'{'$logTimeFormat'}'/}
   fi
 
-  if [ -z "$logTimeFormat" ]; then
-    eval ${innerAppenderName}['logTimeFormat']="\$Log__DefalutLogTimeFormat"
-  else
-    eval ${innerAppenderName}['logTimeFormat']="\$logTimeFormat"
-  fi
+  eval ${innerAppenderName}['logPattern']="\$logPattern"
+  eval ${innerAppenderName}['logTimeFormat']="\$logTimeFormat"
 }
 
 LogAppenderRegistry(){
@@ -163,7 +181,7 @@ LogAppenderRegistry(){
   innerAppenderName="__log_appender_${appenderName}"
 
   # 2. check appender exist
-  [ -n "${Log_Global_Appender[$innerAppenderName]}" ] && throw "Log Appender[$appenderName] has been registered" 
+  Array::Contains "$innerAppenderName" "${Log_Global_Appender[@]}" && throw "Log Appender[$appenderName] has been registered" 
 
   # 3. registry to cache
   Log_Global_Appender+=("${innerAppenderName}")

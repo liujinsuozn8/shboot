@@ -35,3 +35,38 @@
 
 # 内置变量
 - PROJECT_ROOT，当前工程的根目录
+
+# 日期处理
+## 日期变换
+
+  y 年 yyyy=%Y, yy=%y
+  M 月 MM=%m
+  d 日 dd=%d
+  h 时 在上午或下午 (1~12), hh=%l
+  H 时 在一天中 (0~23) HH=%H
+  m 分 mm=%M
+  s 秒 ss=%S
+  S 毫秒 
+  F 周几 %w
+  E 星期(全称)    len=1   %A
+  D 一年中的第几天  %j
+  w 一年中第几个星期 %U
+  a 上午 / 下午 标记符 %P
+  z 时区 %Z
+
+---------------------------------
+
+  y year  yyyy=%Y, yy=%y
+  M month MM=%m
+  d day dd=%d
+  h hour (1~12)  hh=%l
+  H hour (0~23) HH=%H
+  m minute mm=%M
+  s second ss=%S
+  S milli second --> handler by Date::Format
+  F day of week %w
+  E week of year    len=1   %A
+  D day of year  %j
+  w week of year %U
+  a AM./PM. %P
+  z zone %Z date '+%Z'

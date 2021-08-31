@@ -1,4 +1,5 @@
 import log/registry
+import date/base
 
 ########################################
 
@@ -22,7 +23,8 @@ __populate_msg(){
   local method="$5"
 
   local level="${Log__LevelStr[$levelId]}"
-  local time=$( printf "%(${logTimeFormat})T" "-1" )
+  local time=$(Date::FormatNow "${logTimeFormat}")
+  # local time=$( printf "%()T" "-1" )
 
   eval echo $logPattern
 }

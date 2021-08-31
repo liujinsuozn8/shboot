@@ -1,18 +1,34 @@
 
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
-# import log/base
-# LogAppenderRegistry 'ma' 'Console' -logPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='DEBUG'
-# Log::DEBUG 'testmsg2'
-# Log::INFO 'testmsg3'
+import log/base
+#LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{%Y/%m/%d} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
 
-import string/regex
-a='${time}{%Y/%m/%d %H:%M:%S} [${level}]'
-Regex::Matcher "$a" '(\$\{time\}[^\}]*\}).*' 1
-b=$(Regex::Matcher "$a" 'ssss')
-if [ -z "$b" ];then
-  echo 'empty'
-fi
+LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
+LogAppenderRegistry 'xx' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
+Log::DEBUG 'testmsg2'
+Log::INFO 'testmsg3'
+
+# timestamp='1630422072-343623000'
+# seconds=${timestamp%-*}
+# nano=${timestamp#*-}
+# echo "$nano"
+# 1630422072-343623000
+# 1630424710 371353700
+# 0123456789 012345678
+# timestamp='1630422072343623000'
+# seconds=${timestamp:0:10}
+# nano=${timestamp:10}
+# echo "$seconds"
+# echo "$nano"
+
+import date/base
+# import string/regex
+
+a=$(Date::FormatNow 'yyyy/MM/dd HH:mm:ss.SSSS E')
+
+echo $a
+
 ############################################################
 #appender.stdout = Console
 #appender.stdout.Target = STDERR
