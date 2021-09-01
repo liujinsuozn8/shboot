@@ -1,35 +1,34 @@
+import log/common
 import log/registry
+import log/appender
 import date/base
+import string/base
 
 ########################################
-
-__output_log_Console(){
-  # Usage: __output_log_Console appenderName msg
-  echo "$2"
-}
-
 __populate_msg(){
   # __populate__log appenderName levelId msg shell method
   local appenderName="$1"
 
-  # get config of appender
+  # 1. get config of appender
   eval local logPattern=\${${appenderName}['logPattern']}
-  eval local logTimeFormat=\${${appenderName}['logTimeFormat']-\${Log__DefalutLogTimeFormat}}
   
-  # populate log
+  # 2. get paramter
   local levelId="$2"
   local msg="$3"
   local shell="$4"
   local method="$5"
-
   local level="${Log__LevelStr[$levelId]}"
-  local time=$(Date::FormatNow "${logTimeFormat}")
-  # local time=$( printf "%()T" "-1" )
 
+  # 3. Create time string And Replace time format with it
+  # 3.1 Get timestamp
+  local timestamp=$(Date::NowTimestamp)
+  logPattern=$(Log::PopulateTime "$timestamp" "$logPattern")
+
+  # 4. populate message
   eval echo $logPattern
 }
 
-__log(){
+LogOutput(){
   # Usage: __print_log levelId msg shell method
   local levelId=$1
 
@@ -50,7 +49,7 @@ __log(){
 
     # 3. output log （to console or file）
     eval local appenderType="\${${appenderName}['type']}"
-    eval "__output_log_${appenderType}" "\$appenderName" "\$msg"
+    eval "LogOutput_${appenderType}" "\$appenderName" "\$msg"
   done
 }
 
@@ -58,25 +57,25 @@ __log(){
 
 Log::DEBUG() {
   # Usage: Log::DEBUG 'msg'
-  __log DEBUG "$1" "${BASH_SOURCE[-1]--}" "${FUNCNAME[-1]--}"
+  LogOutput DEBUG "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::INFO() {
   # Usage: Log::INFO 'msg'
-  __log INFO "$1" "${BASH_SOURCE[-1]--}" "${FUNCNAME[-1]--}"
+  LogOutput INFO "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::WARN() {
   # Usage: Log::WARN 'msg'
-  __log WARN "$1" "${BASH_SOURCE[-1]--}" "${FUNCNAME[-1]--}"
+  LogOutput WARN "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::ERROR() {
   # Usage: Log::ERROR 'msg'
-  __log ERROR "$1" "${BASH_SOURCE[-1]--}" "${FUNCNAME[-1]--}"
+  LogOutput ERROR "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::FATAL() {
   # Usage: Log::FATAL 'msg'
-  __log FATAL "$1" "${BASH_SOURCE[-1]--}" "${FUNCNAME[-1]--}"
+  LogOutput FATAL "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
