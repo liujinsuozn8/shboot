@@ -4,7 +4,7 @@
 ############################################
 
 LogOutput_Console(){
-  # Usage: __output_log_Console appenderName msg
+  # Usage: LogOutput_Console appenderName msg
   echo "$2" 
 }
 
@@ -64,14 +64,14 @@ LogAppenderRegistry_Console(){
 ############################################
 
 LogOutput_FileAppender(){
-  # Usage: __output_log_FileAppender appenderName msg
-  # 1. 
-  :
+  # Usage: LogOutput_FileAppender appenderName msg
+  local realPath=$(prepareLogFilePath "$1")
+  echo "$2" >> "$realPath"
 }
 
 LogAppenderRegistry_FileAppender(){
   # Usage LogAppenderRegistry_FileAppender appenderName innerAppenderName settings
-  # settings: -threshold, -logPattern, -flie, -append
+  # settings: -threshold, -logPattern, -file, -append
 
   local appenderName="$1"
   local innerAppenderName="$2"
@@ -107,7 +107,7 @@ LogAppenderRegistry_FileAppender(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
-      -flie=*)
+      -file=*)
         filePath="${1#*=}"
         [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
       ;;
@@ -118,35 +118,19 @@ LogAppenderRegistry_FileAppender(){
     shift
   done
 
-  # 1. check and save flie
+  # 1. check and save file
   # 1.1 empty check
   [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
 
   # 1.2 check parameter is a avaliable path of file
-  if File::isFilePathStr "$filePath" ; then
+  if ! File::isFilePathStr "$filePath" ; then
     throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
   fi
 
   # 1.3 populate time
-  local timestamp=$(Date::NowTimestamp)
-  local curFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
-  eval curFilePath="$curFilePath"
-  
-  # 1.4 check file is writable
-  if [ -z "$curFilePath" ]; then
-    # try to create file
-    File::TryTouch "$curFilePath"
-    if [ $? -ne 0]; then
-      throw "LogAppender ${appenderName}: Illegal file: ${curFilePath}. Can not create."
-    fi
-  else
-    # check writable
-    if [ ! -w "$curFilePath" ]; then
-      throw "LogAppender ${appenderName}: Illegal file: ${curFilePath}. Can not write."
-    fi
-  fi
-  
   eval ${innerAppenderName}['file']="\$filePath"
+  local realFilePath=$(prepareLogFilePath "$innerAppenderName")
+
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
@@ -167,6 +151,37 @@ LogAppenderRegistry_FileAppender(){
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
-    File::clearFile "$curFilePath"
+    File::clearFile "$realFilePath"
   fi
+}
+
+prepareLogFilePath(){
+  # Usage: prepareLogFilePath 'appenderName'
+  local appenderName="$1"
+  eval local filePath=\${${appenderName}['file']}
+
+  # 1. populate time
+  local timestamp=$(Date::NowTimestamp)
+  local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
+  eval realFilePath="$realFilePath"
+  
+  # 2. check file is writable
+  if [ -e "$realFilePath" ]; then
+    # check this path is a file
+    if [ ! -f "$realFilePath" ]; then
+      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not write."
+    fi
+    # check writable
+    if [ ! -w "$realFilePath" ]; then
+      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not write."
+    fi
+  else
+    # try to create file
+    File::TryTouch "$realFilePath"
+    if [ $? -ne 0 ]; then
+      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not create."
+    fi
+  fi
+  
+  echo "$realFilePath"
 }

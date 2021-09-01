@@ -70,3 +70,6 @@
   w week of year %U
   a AM./PM. %P
   z zone %Z date '+%Z'
+
+LogOutput_Console
+LogAppenderRegistry_Console

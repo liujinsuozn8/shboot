@@ -2,32 +2,27 @@
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
 import log/base
-#LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{%Y/%m/%d} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
 
-LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
-LogAppenderRegistry 'xx' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
+LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS}--${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
+# LogAppenderRegistry 'xx' 'FileAppender' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO' -file='/logstest' -append='true'
+LogAppenderRegistry 'xx' 'FileAppender' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO' -file='/logstest/log-${time}{yyyy-MM-dd}.log' -append='true'
 Log::DEBUG 'testmsg2'
 Log::INFO 'testmsg3'
+Log::INFO 'testmsg4'
+Log::INFO 'testmsg5'
 
-# timestamp='1630422072-343623000'
-# seconds=${timestamp%-*}
-# nano=${timestamp#*-}
-# echo "$nano"
-# 1630422072-343623000
-# 1630424710 371353700
-# 0123456789 012345678
-# timestamp='1630422072343623000'
-# seconds=${timestamp:0:10}
-# nano=${timestamp:10}
-# echo "$seconds"
-# echo "$nano"
+# declare -Ag xx
+# xx['file']='/logstest/log-${time}{yyyy-MM-dd}.log/'
+# prepareLogFilePath "xx"
+# prepareLogFilePath "xx"
+# prepareLogFilePath "xx"
 
-import date/base
-# import string/regex
+# import file/base
+# filePath='/logstest/log-${time}{yyyy-MM-dd}.log'
+# File::isFilePathStr "$filePath"
 
-a=$(Date::FormatNow 'yyyy/MM/dd HH:mm:ss.SSSS E')
 
-echo $a
+
 
 ############################################################
 #appender.stdout = Console
@@ -38,11 +33,11 @@ echo $a
 
 
 #appender.D = FileAppender
-#appender.D.Target = E://logs/log.log
+#appender.D.File = /logstest/log-${time}{yyyy-MM-dd}.log
 #appender.D.Append = true
 #appender.D.Threshold = DEBUG
-#appender.D.logPattern = ''
-#appender.D.timeFormat = ''
+#appender.D.logPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}'
+
 
 
 #abc(){

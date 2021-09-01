@@ -10,7 +10,7 @@ File::TryTouch(){
   local d=${1%/*}
   mkdir -p "$d"
   
-  if [ $? -ne 0]; then
+  if [ $? -ne 0 ]; then
     return $?
   fi
 
@@ -22,7 +22,7 @@ File::TryTouch(){
 
 File::isFilePathStr(){
   # Usage: File::isFilePath 'path'
-  if String::EndsWith "$filePath" '..' || String::EndsWith "$filePath" '/' ; then
+  if String::EndsWith "$1" '..' || String::EndsWith "$1" '/' ; then
     return 1
   else
     return 0
