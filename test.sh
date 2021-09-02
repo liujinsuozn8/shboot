@@ -29,41 +29,21 @@ Log::INFO 'testmsg5'
 #appender.stdout.Target = STDERR
 #appender.stdout.Threshold = DEBUG
 #appender.stdout.LogPattern = ${time}{%Y/%m/%d %H:%M:%S} [${level}] Method:[${shell}--${method}] msg:${msg}
-#appender.stdout.LogTimeFormat = %Y/%m/%d %H:%M:%S
 
 
-#appender.D = FileAppender
-#appender.D.File = /logstest/log-${time}{yyyy-MM-dd}.log
-#appender.D.Append = true
-#appender.D.Threshold = DEBUG
-#appender.D.logPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}'
+#appender.RAF = RandomAccessFile
+#appender.RAF.File = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+#appender.RAF.Append = true
+#appender.RAF.Threshold = DEBUG
+#appender.RAF.logPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}'
+
+#appender.RF = RollingFile
+#appender.RF.File = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+#appender.RF.Append = true
+#appender.RF.Threshold = DEBUG
+#appender.RF.logPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}'
 
 
-
-#abc(){
-#  echo ${FUNCNAME[@]}
-#}
-
-#cde(){
-#  abc
-#  echo ${BASH_SOURCE[@]} ${FUNCNAME[-1]}
-#}
-
-
-
-
-# CreateConsoleLogAppender "ma" "mypattern"
-# # CreateConsoleLogAppender 'ma'
-# LoggerRegistry 'ma' __console__Logger_ma
-
-# ${__log_appender['ma']} 'test'
-
-
-
-# Log::DEBUG 'xxxxxx'
-# -->
-# for rootLogger
-#
 
 ####################################################
 # ----- task -----

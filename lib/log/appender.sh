@@ -118,7 +118,7 @@ LogAppenderRegistry_RandomAccessFile(){
     shift
   done
 
-  # 1. check and save file
+  # 1. check and init file
   # 1.1 empty check
   [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
 
@@ -131,6 +131,8 @@ LogAppenderRegistry_RandomAccessFile(){
   eval ${innerAppenderName}['file']="\$filePath"
   local realFilePath=$(prepareLogFilePath "$innerAppenderName")
 
+  # 1.4 init file
+  initLogFile "$innerAppenderName" "$realFilePath"
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
@@ -181,29 +183,30 @@ prepareLogFilePath(){
     local dd=$(Date::Format "$timestamp" "dd")
   fi
 
-  eval realFilePath="$realFilePath"
-  
-  # 3. check file is writable
-  if [ -e "$realFilePath" ]; then
+  eval echo "$realFilePath"
+}
+
+initLogFile(){
+  # Usage: initLogFile 'appenderName' 'filePath'
+  # check file is writable
+  if [ -e "$2" ]; then
     # check this path is a file
-    if [ ! -f "$realFilePath" ]; then
-      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not write."
+    if [ ! -f "$2" ]; then
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
     fi
     # check writable
-    if [ ! -w "$realFilePath" ]; then
-      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not write."
+    if [ ! -w "$2" ]; then
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
     fi
   else
     # try to create file
-    File::TryTouch "$realFilePath"
+    File::TryTouch "$2"
     if [ $? -ne 0 ]; then
-      throw "LogAppender ${appenderName}: Illegal file: ${realFilePath}. Can not create."
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not create."
     fi
   fi
-  
-  echo "$realFilePath"
 }
 
 ############################################
-# FileAppender
+# RollingFile
 ############################################
