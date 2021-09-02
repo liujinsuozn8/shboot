@@ -60,17 +60,17 @@ LogAppenderRegistry_Console(){
 }
 
 ############################################
-# FileAppender
+# RandomAccessFile
 ############################################
 
-LogOutput_FileAppender(){
-  # Usage: LogOutput_FileAppender appenderName msg
+LogOutput_RandomAccessFile(){
+  # Usage: LogOutput_RandomAccessFile appenderName msg
   local realPath=$(prepareLogFilePath "$1")
   echo "$2" >> "$realPath"
 }
 
-LogAppenderRegistry_FileAppender(){
-  # Usage LogAppenderRegistry_FileAppender appenderName innerAppenderName settings
+LogAppenderRegistry_RandomAccessFile(){
+  # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
   # settings: -threshold, -logPattern, -file, -append
 
   local appenderName="$1"
@@ -163,9 +163,27 @@ prepareLogFilePath(){
   # 1. populate time
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
+
+  # 2. extend parameter 
+  if String::Contains "$realFilePath" '${yyyy}'; then
+    local yyyy=$(Date::Format "$timestamp" "yyyy")
+  fi
+
+  if String::Contains "$realFilePath" '${yy}'; then
+    local yy=$(Date::Format "$timestamp" "yy")
+  fi
+
+  if String::Contains "$realFilePath" '${MM}'; then
+    local MM=$(Date::Format "$timestamp" "MM")
+  fi
+
+  if String::Contains "$realFilePath" '${dd}'; then
+    local dd=$(Date::Format "$timestamp" "dd")
+  fi
+
   eval realFilePath="$realFilePath"
   
-  # 2. check file is writable
+  # 3. check file is writable
   if [ -e "$realFilePath" ]; then
     # check this path is a file
     if [ ! -f "$realFilePath" ]; then
@@ -185,3 +203,7 @@ prepareLogFilePath(){
   
   echo "$realFilePath"
 }
+
+############################################
+# FileAppender
+############################################

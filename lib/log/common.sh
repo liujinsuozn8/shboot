@@ -24,7 +24,7 @@ declare -g Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
 declare -g Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
 
 declare -g Log__Type_Console='Console'
-declare -g Log__Type_FileAppender='FileAppender'
+declare -g Log__Type_RandomAccessFile='RandomAccessFile'
 declare -g Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
 ################################################################

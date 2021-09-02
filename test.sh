@@ -5,7 +5,7 @@ import log/base
 
 LogAppenderRegistry 'ma' 'Console' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS}--${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO'
 # LogAppenderRegistry 'xx' 'FileAppender' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO' -file='/logstest' -append='true'
-LogAppenderRegistry 'xx' 'FileAppender' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO' -file='/logstest/log-${time}{yyyy-MM-dd}.log' -append='true'
+LogAppenderRegistry 'xx' 'RandomAccessFile' -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' -threshold='INFO' -file='/logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log' -append='true'
 Log::DEBUG 'testmsg2'
 Log::INFO 'testmsg3'
 Log::INFO 'testmsg4'

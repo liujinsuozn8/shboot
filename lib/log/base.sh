@@ -45,7 +45,7 @@ LogOutput(){
     fi
 
     # 2. populate msg
-    local msg="$(__populate_msg "$appenderName" "$@")"
+    local msg=$(__populate_msg "$appenderName" "$@")
 
     # 3. output log （to console or file）
     eval local appenderType="\${${appenderName}['type']}"
@@ -79,3 +79,14 @@ Log::FATAL() {
   # Usage: Log::FATAL 'msg'
   LogOutput FATAL "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
+
+
+export -f Log::DEBUG
+
+export -f Log::INFO
+
+export -f Log::WARN
+
+export -f Log::ERROR
+
+export -f Log::FATAL
