@@ -212,3 +212,18 @@ initLogFile(){
 ############################################
 # RollingFile
 ############################################
+# appender.RF = RollingFile
+# appender.RF.File = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+# appender.RF.Append = true
+# appender.RF.Threshold = DEBUG
+# appender.RF.logPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}
+# appender.RF.Policies.OnStartupTriggeringPolicy   = true
+# appender.RF.Policies.SizeBasedTriggeringPolicy = 20MB
+#    compare size with SizeBasedTriggeringPolicy
+#    can check when startup
+# appender.RF.Policies.TimeBasedTriggeringPolicy = 10h
+#    compare MTime and Now
+#    can not check when startup
+# appender.RF.Policies.DailyTriggeringPolicy = true
+
+# how to get last number of file
