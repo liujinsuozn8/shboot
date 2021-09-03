@@ -7,11 +7,12 @@ File::TryTouch(){
   fi
 
   # 2. mkdir
-  local d=${1%/*}
+  local d="${1%/*}"
   mkdir -p "$d"
-  
-  if [ $? -ne 0 ]; then
-    return $?
+
+  local result=$?
+  if [ $result -ne 0 ]; then
+    return $result
   fi
 
   # 3. touch

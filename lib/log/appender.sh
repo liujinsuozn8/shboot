@@ -65,10 +65,10 @@ LogAppenderRegistry_Console(){
 
 LogOutput_RandomAccessFile(){
   # Usage: LogOutput_RandomAccessFile appenderName msg
-  local realPath=$(prepareLogFilePath "$1")
+  local realFilePath=$(prepareLogFilePath "$1")
   initLogFile "$1" "$realFilePath"
 
-  echo "$2" >> "$realPath"
+  echo "$2" >> "$realFilePath"
 }
 
 LogAppenderRegistry_RandomAccessFile(){
