@@ -36,6 +36,21 @@ File::clearFile(){
     > "$1"
   fi
 }
+
+File::ATime(){
+  # Usage: File::ATime 'filePath'
+  stat -c %x "$1"
+}
+
+File::MTime(){
+  # Usage: File::MTime 'filePath'
+  stat -c %y "$1"
+}
+
+File::CTime(){
+  # Usage: File::CTime 'filePath'
+  stat -c %z "$1"
+}
 # while read -r line; do
 #   line=$(String_trim $line)
   

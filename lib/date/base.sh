@@ -78,4 +78,9 @@ Date::Format(){
   fi
 
   echo "$result"
-} 
+}
+
+Date::ZeroAMTimestramp(){
+  # Usage: Date::ZeroAMTimestramp
+  date -d "$(date +%F)" +%s
+}
