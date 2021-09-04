@@ -126,7 +126,7 @@ LogAppenderRegistry_RandomAccessFile(){
   [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
 
   # 1.2 check parameter is a avaliable path of file
-  if ! File::isFilePathStr "$fileName" ; then
+  if ! File::IsFilePathStr "$fileName" ; then
     throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
   fi
 
@@ -157,7 +157,7 @@ LogAppenderRegistry_RandomAccessFile(){
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
-    File::clearFile "$realFilePath"
+    File::ClearFile "$realFilePath"
   fi
 }
 
@@ -215,7 +215,7 @@ initLogFile(){
 # RollingFile
 ############################################
 LogAppenderRegistry_RollingFile(){
-  # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
+  # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
   # settings: -threshold, -logPattern, -file, -append
 
   local appenderName="$1"
@@ -268,7 +268,7 @@ LogAppenderRegistry_RollingFile(){
   [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
 
   # 1.2 check parameter is a avaliable path of file
-  if ! File::isFilePathStr "$fileName" ; then
+  if ! File::IsFilePathStr "$fileName" ; then
     throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
   fi
 
@@ -298,11 +298,11 @@ LogAppenderRegistry_RollingFile(){
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
-    File::clearFile "$realFilePath"
+    File::ClearFile "$realFilePath"
   fi
 }
 # appender.RF = RollingFile
-# appender.RF.File = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+# appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
 # appender.RF.Append = true
 # appender.RF.Threshold = DEBUG
 # appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}

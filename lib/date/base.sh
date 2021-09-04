@@ -51,7 +51,7 @@ Date::ToShellDateFormat(){
 }
 
 Date::NowTimestamp(){
-  # Usage: Date::CurentTimestamp
+  # Usage: Date::NowTimestamp
   date '+%s%N'
 }
 

@@ -1,8 +1,8 @@
 File::TryTouch(){
-  # Usage: File::Mkdir 'filePath'
+  # Usage: File::TryTouch 'filePath'
 
   # 1. paramter check
-  if ! File::isFilePathStr "$1"; then
+  if ! File::IsFilePathStr "$1"; then
     return 100
   fi
 
@@ -21,7 +21,7 @@ File::TryTouch(){
   return $?
 }
 
-File::isFilePathStr(){
+File::IsFilePathStr(){
   # Usage: File::isFilePath 'path'
   if String::EndsWith "$1" '..' || String::EndsWith "$1" '/' ; then
     return 1
@@ -30,8 +30,8 @@ File::isFilePathStr(){
   fi
 }
 
-File::clearFile(){
-  # Usage: File::clearFile 'filePath'
+File::ClearFile(){
+  # Usage: File::ClearFile 'filePath'
   if [ -f "$1" ]; then
     > "$1"
   fi
