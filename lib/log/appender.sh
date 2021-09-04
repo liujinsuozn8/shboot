@@ -74,7 +74,7 @@ LogOutput_RandomAccessFile(){
 
 LogAppenderRegistry_RandomAccessFile(){
   # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
-  # settings: -threshold, -logPattern, -file, -append
+  # settings: -threshold, -logPattern, -fileName, -append
 
   local appenderName="$1"
   local innerAppenderName="$2"
@@ -110,9 +110,9 @@ LogAppenderRegistry_RandomAccessFile(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
-      -file=*)
-        filePath="${1#*=}"
-        [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
+      -fileName=*)
+        fileName="${1#*=}"
+        [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
       *)
         throw "LogAppender ${appenderName}: Illegal parameter: $1"
@@ -123,15 +123,15 @@ LogAppenderRegistry_RandomAccessFile(){
 
   # 1. check and init file
   # 1.1 empty check
-  [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
+  [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
 
   # 1.2 check parameter is a avaliable path of file
-  if ! File::isFilePathStr "$filePath" ; then
+  if ! File::isFilePathStr "$fileName" ; then
     throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
   fi
 
   # 1.3 populate time
-  eval ${innerAppenderName}['file']="\$filePath"
+  eval ${innerAppenderName}['fileName']="\$fileName"
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(prepareLogFilePath "$innerAppenderName" "$timestamp")
 
@@ -165,7 +165,7 @@ prepareLogFilePath(){
   # Usage: prepareLogFilePath 'appenderName' 'timestamp'
   local appenderName="$1"
   local timestamp="$2"
-  eval local filePath=\${${appenderName}['file']}
+  eval local filePath=\${${appenderName}['fileName']}
 
   # 1. populate time
   local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
@@ -223,7 +223,7 @@ LogAppenderRegistry_RollingFile(){
   shift 2
 
   local threshold
-  local filePath
+  local fileName
   local append
   local logPattern
 
@@ -252,9 +252,9 @@ LogAppenderRegistry_RollingFile(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
-      -file=*)
-        filePath="${1#*=}"
-        [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
+      -fileName=*)
+        fileName="${1#*=}"
+        [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
       *)
         throw "LogAppender ${appenderName}: Illegal parameter: $1"
@@ -265,15 +265,15 @@ LogAppenderRegistry_RollingFile(){
 
   # 1. check and init file
   # 1.1 empty check
-  [ -z "$filePath" ] && throw "LogAppender [${appenderName}]: FilePath is empty"
+  [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
 
   # 1.2 check parameter is a avaliable path of file
-  if ! File::isFilePathStr "$filePath" ; then
+  if ! File::isFilePathStr "$fileName" ; then
     throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
   fi
 
   # 1.3 populate time
-  eval ${innerAppenderName}['file']="\$filePath"
+  eval ${innerAppenderName}['file']="\$fileName"
   local realFilePath=$(prepareLogFilePath "$innerAppenderName")
 
   # 1.4 init file
