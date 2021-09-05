@@ -10,6 +10,7 @@ Builtin::Basename() {
 
   printf '%s\n' "${tmp:-/}"
 }
+export -f Builtin::Basename
 
 Builtin::Dirname() {
   # from: https://github.com/dylanaraps/pure-bash-bible
@@ -33,6 +34,7 @@ Builtin::Dirname() {
 
   printf '%s\n' "${tmp:-/}"
 }
+export -f Builtin::Dirname
 
 Builtin::AbsPath() {
   # from: http://stackoverflow.com/questions/3915040/bash-fish-command-to-print-absolute-path-to-a-file
@@ -47,3 +49,4 @@ Builtin::AbsPath() {
     echo "$(cd "$(Builtin::Dirname "$file")" && pwd)/$(Builtin::Basename "$file")"
   fi
 }
+export -f Builtin::AbsPath

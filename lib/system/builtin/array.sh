@@ -8,3 +8,5 @@ Builtin::ArrayContains() {
   done
   return 1
 }
+
+export -f Builtin::ArrayContains

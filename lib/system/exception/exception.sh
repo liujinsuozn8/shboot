@@ -13,3 +13,5 @@ throw() {
   # kill caller
   kill -s TERM "$$"
 }
+
+export -f throw

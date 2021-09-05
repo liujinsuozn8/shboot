@@ -1,4 +1,8 @@
 
+if [ "$__boot__bootstrapped" == true ]; then
+  return 0
+fi
+echo '__boot__bootstrapped'
 ##########################################################################
 # from: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh #
 ##########################################################################
@@ -7,13 +11,14 @@
 # If you modify the path of the package, you must locate the path to lib/ #
 ###########################################################################
 # lib/
-declare -g __boot__libPath="$( cd "${BASH_SOURCE[0]%/*}/../.." && pwd )"
+declare -x __boot__libPath="$( cd "${BASH_SOURCE[0]%/*}/../.." && pwd )"
 # lib/..
-declare -g  __boot__path="${__boot__libPath}/.."
+declare -x  __boot__path="${__boot__libPath}/.."
 # /dev/fd
-declare -g  __boot__fdPath=$(dirname <(echo))
-declare -gi __boot__fdLength=$(( ${#__boot__fdPath} + 1 ))
-declare -ag __boot__importedFiles
+declare -x  __boot__fdPath=$(dirname <(echo))
+declare -ix __boot__fdLength=$(( ${#__boot__fdPath} + 1 ))
+# declare -ag __boot__importedFiles
+export __boot__importedFiles=( )
 
 System::WrapSource() {
   local libPath="$1"
@@ -21,6 +26,7 @@ System::WrapSource() {
 
   builtin source "$libPath" "$@" || throw "Unable to load $libPath"
 }
+export -f System::WrapSource
 
 System::SourceFile() {
   local libPath="$1"
@@ -37,13 +43,16 @@ System::SourceFile() {
       return 0
     fi
 
+    # export __boot__importedFiles=(${__boot__importedFiles[@]})
     __boot__importedFiles+=( "$libPath" )
+    export __boot__importedFiles=(${__boot__importedFiles[@]})
     __boot__importParent=$(dirname "$libPath") System::WrapSource "$libPath" "$@"
 
   else
     :
   fi
 }
+export -f System::SourceFile
 
 System::SourcePath() {
   local libPath="$1"
@@ -62,6 +71,7 @@ System::SourcePath() {
     System::SourceFile "$libPath" "$@"
   fi
 }
+export -f System::SourcePath
 
 System::ImportOne() {
   local libPath="$1"
@@ -106,6 +116,7 @@ System::ImportOne() {
   System::SourcePath "${requestedPath}" "$@" || \
   System::SourcePath "${libPath}" "$@" || throw "Cannot import $libPath"
 }
+export -f System::ImportOne
 
 System::Import() {
   local libPath
@@ -113,6 +124,12 @@ System::Import() {
     System::ImportOne "$libPath"
   done
 }
+export -f System::Import
 
-alias import="__boot__allowFileReloading=false System::Import"
-declare -g __boot__bootstrapped=true
+# alias import="__boot__allowFileReloading=false System::Import"
+import(){
+  __boot__allowFileReloading=false
+  System::Import "$@"
+}
+export -f import
+declare -x __boot__bootstrapped=true
