@@ -2,7 +2,7 @@
 if [ "$__boot__bootstrapped" == true ]; then
   return 0
 fi
-echo '__boot__bootstrapped'
+
 ##########################################################################
 # from: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh #
 ##########################################################################
