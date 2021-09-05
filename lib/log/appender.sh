@@ -131,7 +131,7 @@ LogAppenderRegistry_RandomAccessFile(){
   fi
 
   # 1.3 populate time
-  eval ${innerAppenderName}['fileName']="\$fileName"
+  eval ${innerAppenderName}'_fileName'="\$fileName"
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(prepareLogFilePath "$innerAppenderName" "$timestamp")
 
@@ -140,20 +140,20 @@ LogAppenderRegistry_RandomAccessFile(){
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}['logPattern']="\$logPattern"
+  eval ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 3. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['threshold']=\$Log__DefalutLevel
+    eval ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}['threshold']=\$threshold
+    eval ${innerAppenderName}'_threshold'=\$threshold
   fi
 
   # 4. save append
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['append']='true'
+    eval ${innerAppenderName}'_append'='true'
   else
-    eval ${innerAppenderName}['append']="\$append"
+    eval ${innerAppenderName}'_append'="\$append"
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
@@ -165,7 +165,7 @@ prepareLogFilePath(){
   # Usage: prepareLogFilePath 'appenderName' 'timestamp'
   local appenderName="$1"
   local timestamp="$2"
-  eval local filePath=\${${appenderName}['fileName']}
+  eval local filePath=\${${appenderName}'_fileName'}
 
   # 1. populate time
   local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
