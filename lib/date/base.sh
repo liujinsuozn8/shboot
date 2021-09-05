@@ -49,17 +49,20 @@ Date::ToShellDateFormat(){
 
   echo "$format"
 }
+export -f Date::ToShellDateFormat
 
 Date::NowTimestamp(){
   # Usage: Date::NowTimestamp
   date '+%s%N'
 }
+export -f Date::NowTimestamp
 
 Date::FormatNow() {
   # Usage Date::FormatNow foramt
   local timestamp=$(Date::NowTimestamp)
   Date::Format "$timestamp" "$1"
 }
+export -f Date::FormatNow
 
 Date::Format(){
   # Usage Date::Format timestamp format
@@ -79,8 +82,10 @@ Date::Format(){
 
   echo "$result"
 }
+export -f Date::Format
 
 Date::ZeroAMTimestramp(){
   # Usage: Date::ZeroAMTimestramp
   date -d "$(date +%F)" +%s
 }
+export -f Date::ZeroAMTimestramp

@@ -9,3 +9,4 @@ Reflect::isFunction(){
     return 1
   fi
 }
+export -f Reflect::isFunction

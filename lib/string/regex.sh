@@ -9,3 +9,4 @@ Regex::Matcher() {
     [[ $1 =~ $2 ]] && printf '%s\n' "${BASH_REMATCH[${num}]}"
   fi
 }
+export -f Regex::Matcher

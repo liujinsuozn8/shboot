@@ -124,14 +124,16 @@
     # 6. 日志输出内容的模版字符串
     appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}
     # 7. 日志滚动的策略
-    # 7.1 是否在启动时执行滚动策略
-    appender.RF.Policies.OnStartupTriggeringPolicy   = true
-    # 7.2 日志大小
+    # 7.1-7.3 必须设置一个，否则无法启动。并且，如果设置了7.3值只能是 true
+
+    # 7.1 日志大小
     appender.RF.Policies.SizeBasedTriggeringPolicy = 20MB
-    # 7.3 滚动日志的时间
+    # 7.2 滚动日志的时间
     appender.RF.Policies.TimeBasedTriggeringPolicy = 10h
-    # 7.4 是否按天执行日志滚动
+    # 7.3 是否按天执行日志滚动
     appender.RF.Policies.DailyTriggeringPolicy = true
+    # 7.4 是否在启动时执行滚动策略
+    appender.RF.Policies.OnStartupTriggeringPolicy   = true
     ```
 
 ### 各种模版中的${time}
@@ -242,6 +244,13 @@
 
     - `File::CTime 'filePath'`
         - 获取一个文件的 `Change Time`
+    - `File::Basename 'path'`
+        - 使用内置方法，从路径中获取 basename
+    - `File::Dirname 'path'`
+        - 使用内置方法，获取一个路径的目录
+    - `File::AbsPath 'relative filename'`
+        - 获取一个文件路径的绝对路径
+    
 
 ## lib/relect
 - `import relect/base`

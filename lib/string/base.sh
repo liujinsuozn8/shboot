@@ -12,6 +12,7 @@ String::Trim() {
   : "${_%"${_##*[![:space:]]}"}"
   printf '%s\n' "$_"
 }
+export -f String::Trim
 
 String::StartsWith() {
   # Usage：if String::StartsWith "abc" "ab"
@@ -22,6 +23,7 @@ String::StartsWith() {
     return 1
   fi
 }
+export -f String::StartsWith
 
 String::EndsWith() {
   # Usage：if String::EndsWith "abc" "bc"
@@ -32,6 +34,7 @@ String::EndsWith() {
     return 1
   fi
 }
+export -f String::EndsWith
 
 String::Contains(){
   # Usage：if String::Contains "abcd" "bc"
@@ -41,3 +44,4 @@ String::Contains(){
     return 1
   fi
 }
+export -f String::Contains
