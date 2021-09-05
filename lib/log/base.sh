@@ -27,6 +27,7 @@ __populate_msg(){
   # 4. populate message
   eval echo $logPattern
 }
+export -f __populate_msg
 
 LogOutput(){
   # Usage: __print_log levelId msg shell method
@@ -52,6 +53,7 @@ LogOutput(){
     eval "LogOutput_${appenderType}" "\$appenderName" "\$msg"
   done
 }
+export -f LogOutput
 
 ########################################
 

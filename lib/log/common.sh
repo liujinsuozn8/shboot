@@ -1,31 +1,32 @@
 ################################################################
 # log level
-declare -Ag Log__LevelStr
+export DEBUG=0
+export INFO=1
+export WARN=2
+export ERROR=3
+export FATAL=4
 
-declare -ig DEBUG=10
-declare -ig INFO=20
-declare -ig WARN=30
-declare -ig ERROR=40
-declare -ig FATAL=50
-
+declare -a Log__LevelStr
 Log__LevelStr[DEBUG]="DEBUG"
 Log__LevelStr[INFO]="INFO "
 Log__LevelStr[WARN]="WARN "
 Log__LevelStr[ERROR]="ERROR"
 Log__LevelStr[FATAL]="FATAL"
+export Log__LevelStr=( ${Log__LevelStr[@]} )
+
 
 ################################################################
-declare -ig Log_Root_Level=DEBUG
+export Log_Root_Level=DEBUG
 
 # default value of log
-declare -g Log__DefalutLevel=DEBUG
+export Log__DefalutLevel=DEBUG
 #declare -g Log__DefalutLogTimeFormat='%Y/%m/%d %H:%M:%S'
-declare -g Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
-declare -g Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
+export Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
+export Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
 
-declare -g Log__Type_Console='Console'
-declare -g Log__Type_RandomAccessFile='RandomAccessFile'
-declare -g Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
+export Log__Type_Console='Console'
+export Log__Type_RandomAccessFile='RandomAccessFile'
+export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
 ################################################################
 
@@ -54,3 +55,5 @@ Log::PopulateTime(){
 
   echo "$pattern"
 }
+
+export -f Log::PopulateTime

@@ -8,7 +8,7 @@ import file/base
 
 ################################################################
 # registry appender
-declare -ag Log_Global_Appender
+export Log_Global_Appender=( )
 
 ################################################################
 # common
@@ -37,6 +37,7 @@ LogAppenderRegistry(){
 
   # 3. registry to cache
   Log_Global_Appender+=("${innerAppenderName}")
+  export Log_Global_Appender=( ${Log_Global_Appender[@]} )
 
   # 4. create appender
   eval declare -Ag $innerAppenderName
