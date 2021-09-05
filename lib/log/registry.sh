@@ -40,8 +40,8 @@ LogAppenderRegistry(){
   export Log_Global_Appender=( ${Log_Global_Appender[@]} )
 
   # 4. create appender
-  eval declare -Ag $innerAppenderName
-  eval ${innerAppenderName}['type']=\${type}
+  # eval declare -Ag $innerAppenderName
+  eval ${innerAppenderName}'_type'=\${type}
 
   # 5. init (if type is legal)
   if Reflect::isFunction "LogAppenderRegistry_${type}"; then

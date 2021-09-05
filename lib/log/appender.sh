@@ -49,13 +49,13 @@ LogAppenderRegistry_Console(){
 
   # 1. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}['logPattern']="\$logPattern"
+  eval ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 2. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['threshold']=\$Log__DefalutLevel
+    eval ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}['threshold']=\$threshold
+    eval ${innerAppenderName}'_threshold'=\$threshold
   fi
 }
 
@@ -81,9 +81,9 @@ LogAppenderRegistry_RandomAccessFile(){
   shift 2
 
   local threshold
+  local logPattern
   local filePath
   local append
-  local logPattern
 
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -216,16 +216,24 @@ initLogFile(){
 ############################################
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
-  # settings: -threshold, -logPattern, -file, -append
+  # settings: 
+  #      -threshold, -logPattern, -fileName, -filePattern, -append
+  #      -onStartupTriggeringPolicy, -sizeBasedTriggeringPolicy
+  #      -timeBasedTriggeringPolicy, -dailyTriggeringPolicy
 
   local appenderName="$1"
   local innerAppenderName="$2"
   shift 2
 
   local threshold
-  local fileName
-  local append
   local logPattern
+  local fileName
+  local filePattern
+  local append
+  local sizeBasedTriggeringPolicy
+  local timeBasedTriggeringPolicy
+  local dailyTriggeringPolicy
+  local onStartupTriggeringPolicy
 
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -240,10 +248,12 @@ LogAppenderRegistry_RollingFile(){
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
         fi
       ;;
+
       -logPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
       ;;
+
       -append=*)
         append="${1#*=}"
         [ -z "$append" ] && throw "LogAppender [${appenderName}]: Append is empty"
@@ -252,16 +262,71 @@ LogAppenderRegistry_RollingFile(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
+
       -fileName=*)
         fileName="${1#*=}"
         [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
+
+      -filePattern=*)
+        filePattern="${1#*=}"
+        [ -z "$filePattern" ] && throw "LogAppender [${appenderName}]: FilePattern is empty"
+      ;;
+
+      -sizeBasedTriggeringPolicy=*)
+        sizeBasedTriggeringPolicy="${1#*=}"
+        [ -z "$sizeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: SizeBasedTriggeringPolicy is empty"
+      ;;
+
+      -timeBasedTriggeringPolicy=*)
+        timeBasedTriggeringPolicy="${1#*=}"
+        [ -z "$timeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: TimeBasedTriggeringPolicy is empty"
+      ;;
+
+      -dailyTriggeringPolicy=*)
+        dailyTriggeringPolicy="${1#*=}"
+        [ -z "$dailyTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: DailyTriggeringPolicy is empty"
+
+        if [ "$dailyTriggeringPolicy" != 'true' ] && [ "$dailyTriggeringPolicy" != 'false' ]; then
+          throw "LogAppender [${appenderName}]: Illegal $dailyTriggeringPolicy. DailyTriggeringPolicy must be one of [true, false]. Now is $dailyTriggeringPolicy"
+        fi
+      ;;
+
+      -onStartupTriggeringPolicy=*)
+        onStartupTriggeringPolicy="${1#*=}"
+        [ -z "$onStartupTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: OnStartupTriggeringPolicy is empty"
+
+        if [ "$onStartupTriggeringPolicy" != 'true' ] && [ "$onStartupTriggeringPolicy" != 'false' ]; then
+          throw "LogAppender [${appenderName}]: Illegal $onStartupTriggeringPolicy. OnStartupTriggeringPolicy must be one of [true, false]. Now is $onStartupTriggeringPolicy"
+        fi
+      ;;
+
       *)
         throw "LogAppender ${appenderName}: Illegal parameter: $1"
       ;;
     esac
     shift
   done
+
+  # 1. save Policy
+  if [ -z "$dailyTriggeringPolicy" ]; then
+    dailyTriggeringPolicy='false'
+  fi
+
+  # check policy
+  if [ -z "$sizeBasedTriggeringPolicy" ] && [ -z "$timeBasedTriggeringPolicy" ] && [ -z "$dailyTriggeringPolicy" ]; then
+    throw "LogAppender ${appenderName}: No policy set. Pleace set 'SizeBasedTriggeringPolicy' or 'SimeBasedTriggeringPolicy' or 'DailyTriggeringPolicy = true'"
+  fi 
+  
+  if [ -z "$onStartupTriggeringPolicy" ]; then
+    onStartupTriggeringPolicy='false'
+  fi
+  eval ${innerAppenderName}['sizeBasedTriggeringPolicy']="\$sizeBasedTriggeringPolicy"
+  eval ${innerAppenderName}['timeBasedTriggeringPolicy']=\$timeBasedTriggeringPolicy
+  eval ${innerAppenderName}['dailyTriggeringPolicy']=\$dailyTriggeringPolicy
+  eval ${innerAppenderName}['onStartupTriggeringPolicy']=\$onStartupTriggeringPolicy
+
+
 
   # 1. check and init file
   # 1.1 empty check
@@ -278,6 +343,11 @@ LogAppenderRegistry_RollingFile(){
 
   # 1.4 init file
   initLogFile "$innerAppenderName" "$realFilePath"
+
+
+
+
+
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
@@ -303,6 +373,7 @@ LogAppenderRegistry_RollingFile(){
 }
 # appender.RF = RollingFile
 # appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+# appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
 # appender.RF.Append = true
 # appender.RF.Threshold = DEBUG
 # appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}

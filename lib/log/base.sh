@@ -10,7 +10,7 @@ __populate_msg(){
   local appenderName="$1"
 
   # 1. get config of appender
-  eval local logPattern=\${${appenderName}['logPattern']}
+  eval local logPattern=\${${appenderName}'_logPattern'}
   
   # 2. get paramter
   local levelId="$2"
@@ -40,7 +40,7 @@ LogOutput(){
   local appenderName
   for appenderName in ${Log_Global_Appender[@]}; do
     # 1. check level
-    eval local threshold="\${${appenderName}['threshold']}"
+    eval local threshold=\${${appenderName}'_threshold'}
     if [[ $levelId -lt $threshold ]]; then
       continue
     fi
@@ -49,7 +49,7 @@ LogOutput(){
     local msg=$(__populate_msg "$appenderName" "$@")
 
     # 3. output log （to console or file）
-    eval local appenderType="\${${appenderName}['type']}"
+    eval local appenderType=\${${appenderName}'_type'}
     eval "LogOutput_${appenderType}" "\$appenderName" "\$msg"
   done
 }
