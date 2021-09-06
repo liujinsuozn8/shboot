@@ -134,7 +134,7 @@ LogAppenderRegistry_RandomAccessFile(){
   fi
 
   # 1.3 populate time
-  eval ${innerAppenderName}'_fileName'="\$fileName"
+  eval export ${innerAppenderName}'_fileName'="\$fileName"
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(prepareLogFilePath "$innerAppenderName" "$timestamp")
 
