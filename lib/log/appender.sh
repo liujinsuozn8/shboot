@@ -31,7 +31,7 @@ LogAppenderRegistry_Console(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
@@ -95,7 +95,7 @@ LogAppenderRegistry_RandomAccessFile(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
@@ -248,7 +248,7 @@ LogAppenderRegistry_RollingFile(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"

@@ -7,18 +7,6 @@ import reflect/base
 import file/base
 
 ################################################################
-# common
-
-__isAvailableLevelStr(){
-  # Usage: __isAvailableLevelStr 'levelStr'
-  code=${!1}
-  if [ -z "$code" ]; then
-    return 1
-  else
-    return 0
-  fi
-}
-################################################################
 LogAppenderRegistry(){
   # Usage: LogAppenderRegistry appenderName type [key=value]
   local appenderName="$1"

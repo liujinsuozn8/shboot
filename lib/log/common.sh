@@ -7,7 +7,7 @@ export ERROR=3
 export FATAL=4
 
 declare -a Log__LevelStr
-Log__LevelStr[DEBUG]="DEBUG"
+Log__LevelStrStr[DEBUG]="DEBUG"
 Log__LevelStr[INFO]="INFO "
 Log__LevelStr[WARN]="WARN "
 Log__LevelStr[ERROR]="ERROR"
@@ -60,5 +60,15 @@ Log::PopulateTime(){
 
   echo "$pattern"
 }
-
 export -f Log::PopulateTime
+
+Log::isAvailableLevelStr(){
+  # Usage: Log::isAvailableLevelStr 'levelStr'
+  code=${!1}
+  if [ -z "$code" ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+export -f Log::isAvailableLevelStr
