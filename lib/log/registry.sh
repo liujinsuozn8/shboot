@@ -20,7 +20,7 @@ LogAppenderRegistry(){
   Array::Contains "$innerAppenderName" "${Log_Global_Appenders}" && throw "Log Appender[$appenderName] has been registered" 
 
   # 3. registry to cache
-  Log_Global_Appenders="$Log_Global_Appenders"${IFS}"$innerAppenderName"
+  export Log_Global_Appenders="$Log_Global_Appenders"${IFS}"$innerAppenderName"
 
   # 4. create appender
   # eval declare -Ag $innerAppenderName

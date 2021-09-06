@@ -22,7 +22,11 @@ export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 ################################################################
 # registry appender
 # !!! Replace the array with a string that connected with IFS !!!
-export Log_Global_Appenders=''
+# !!! Compatible with Mac, execute export where this variable is actually created / modified !!!
+# !!! For Mac, if you execute export here, you cannot get the variable in the subshell !!!
+if [ "$(uname)" != 'Darwin' ]; then
+  export Log_Global_Appenders=''
+fi
 
 ################################################################
 
