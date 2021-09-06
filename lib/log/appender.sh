@@ -7,6 +7,7 @@ LogOutput_Console(){
   # Usage: LogOutput_Console appenderName msg
   echo "$2" 
 }
+export -f LogOutput_Console
 
 LogAppenderRegistry_Console(){
   # Usage LogAppenderRegistry_Console appenderName innerAppenderName settings
@@ -30,7 +31,7 @@ LogAppenderRegistry_Console(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
@@ -49,15 +50,16 @@ LogAppenderRegistry_Console(){
 
   # 1. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}['logPattern']="\$logPattern"
+  eval export ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 2. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['threshold']=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}['threshold']=\$threshold
+    eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 }
+export -f LogAppenderRegistry_Console
 
 ############################################
 # RandomAccessFile
@@ -71,6 +73,7 @@ LogOutput_RandomAccessFile(){
 
   echo "$2" >> "$realFilePath"
 }
+export -f LogOutput_RandomAccessFile
 
 LogAppenderRegistry_RandomAccessFile(){
   # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
@@ -81,9 +84,9 @@ LogAppenderRegistry_RandomAccessFile(){
   shift 2
 
   local threshold
+  local logPattern
   local filePath
   local append
-  local logPattern
 
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -92,7 +95,7 @@ LogAppenderRegistry_RandomAccessFile(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
@@ -131,7 +134,7 @@ LogAppenderRegistry_RandomAccessFile(){
   fi
 
   # 1.3 populate time
-  eval ${innerAppenderName}['fileName']="\$fileName"
+  eval export ${innerAppenderName}'_fileName'="\$fileName"
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(prepareLogFilePath "$innerAppenderName" "$timestamp")
 
@@ -140,32 +143,33 @@ LogAppenderRegistry_RandomAccessFile(){
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}['logPattern']="\$logPattern"
+  eval export ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 3. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['threshold']=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}['threshold']=\$threshold
+    eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 
   # 4. save append
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['append']='true'
+    eval export ${innerAppenderName}'_append'='true'
   else
-    eval ${innerAppenderName}['append']="\$append"
+    eval export ${innerAppenderName}'_append'="\$append"
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
     File::ClearFile "$realFilePath"
   fi
 }
+export -f LogAppenderRegistry_RandomAccessFile
 
 prepareLogFilePath(){
   # Usage: prepareLogFilePath 'appenderName' 'timestamp'
   local appenderName="$1"
   local timestamp="$2"
-  eval local filePath=\${${appenderName}['fileName']}
+  eval local filePath=\${${appenderName}'_fileName'}
 
   # 1. populate time
   local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
@@ -189,6 +193,7 @@ prepareLogFilePath(){
 
   eval echo "$realFilePath"
 }
+export -f prepareLogFilePath
 
 initLogFile(){
   # Usage: initLogFile 'appenderName' 'filePath'
@@ -210,22 +215,31 @@ initLogFile(){
     fi
   fi
 }
+export -f initLogFile
 
 ############################################
 # RollingFile
 ############################################
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
-  # settings: -threshold, -logPattern, -file, -append
+  # settings: 
+  #      -threshold, -logPattern, -fileName, -filePattern, -append
+  #      -onStartupTriggeringPolicy, -sizeBasedTriggeringPolicy
+  #      -timeBasedTriggeringPolicy, -dailyTriggeringPolicy
 
   local appenderName="$1"
   local innerAppenderName="$2"
   shift 2
 
   local threshold
-  local fileName
-  local append
   local logPattern
+  local fileName
+  local filePattern
+  local append
+  local sizeBasedTriggeringPolicy
+  local timeBasedTriggeringPolicy
+  local dailyTriggeringPolicy
+  local onStartupTriggeringPolicy
 
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -234,16 +248,18 @@ LogAppenderRegistry_RollingFile(){
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
         # levelStr ---> levelCode
-        if __isAvailableLevelStr "$threshold"; then
+        if Log::isAvailableLevelStr "$threshold"; then
           threshold=${!threshold}
         else
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
         fi
       ;;
+
       -logPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
       ;;
+
       -append=*)
         append="${1#*=}"
         [ -z "$append" ] && throw "LogAppender [${appenderName}]: Append is empty"
@@ -252,16 +268,71 @@ LogAppenderRegistry_RollingFile(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
+
       -fileName=*)
         fileName="${1#*=}"
         [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
+
+      -filePattern=*)
+        filePattern="${1#*=}"
+        [ -z "$filePattern" ] && throw "LogAppender [${appenderName}]: FilePattern is empty"
+      ;;
+
+      -sizeBasedTriggeringPolicy=*)
+        sizeBasedTriggeringPolicy="${1#*=}"
+        [ -z "$sizeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: SizeBasedTriggeringPolicy is empty"
+      ;;
+
+      -timeBasedTriggeringPolicy=*)
+        timeBasedTriggeringPolicy="${1#*=}"
+        [ -z "$timeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: TimeBasedTriggeringPolicy is empty"
+      ;;
+
+      -dailyTriggeringPolicy=*)
+        dailyTriggeringPolicy="${1#*=}"
+        [ -z "$dailyTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: DailyTriggeringPolicy is empty"
+
+        if [ "$dailyTriggeringPolicy" != 'true' ] && [ "$dailyTriggeringPolicy" != 'false' ]; then
+          throw "LogAppender [${appenderName}]: Illegal $dailyTriggeringPolicy. DailyTriggeringPolicy must be one of [true, false]. Now is $dailyTriggeringPolicy"
+        fi
+      ;;
+
+      -onStartupTriggeringPolicy=*)
+        onStartupTriggeringPolicy="${1#*=}"
+        [ -z "$onStartupTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: OnStartupTriggeringPolicy is empty"
+
+        if [ "$onStartupTriggeringPolicy" != 'true' ] && [ "$onStartupTriggeringPolicy" != 'false' ]; then
+          throw "LogAppender [${appenderName}]: Illegal $onStartupTriggeringPolicy. OnStartupTriggeringPolicy must be one of [true, false]. Now is $onStartupTriggeringPolicy"
+        fi
+      ;;
+
       *)
         throw "LogAppender ${appenderName}: Illegal parameter: $1"
       ;;
     esac
     shift
   done
+
+  # 1. save Policy
+  if [ -z "$dailyTriggeringPolicy" ]; then
+    dailyTriggeringPolicy='false'
+  fi
+
+  # check policy
+  if [ -z "$sizeBasedTriggeringPolicy" ] && [ -z "$timeBasedTriggeringPolicy" ] && [ -z "$dailyTriggeringPolicy" ]; then
+    throw "LogAppender ${appenderName}: No policy set. Pleace set 'SizeBasedTriggeringPolicy' or 'SimeBasedTriggeringPolicy' or 'DailyTriggeringPolicy = true'"
+  fi 
+  
+  if [ -z "$onStartupTriggeringPolicy" ]; then
+    onStartupTriggeringPolicy='false'
+  fi
+  eval ${innerAppenderName}['sizeBasedTriggeringPolicy']="\$sizeBasedTriggeringPolicy"
+  eval ${innerAppenderName}['timeBasedTriggeringPolicy']=\$timeBasedTriggeringPolicy
+  eval ${innerAppenderName}['dailyTriggeringPolicy']=\$dailyTriggeringPolicy
+  eval ${innerAppenderName}['onStartupTriggeringPolicy']=\$onStartupTriggeringPolicy
+
+
 
   # 1. check and init file
   # 1.1 empty check
@@ -278,6 +349,11 @@ LogAppenderRegistry_RollingFile(){
 
   # 1.4 init file
   initLogFile "$innerAppenderName" "$realFilePath"
+
+
+
+
+
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
@@ -303,6 +379,7 @@ LogAppenderRegistry_RollingFile(){
 }
 # appender.RF = RollingFile
 # appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
+# appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
 # appender.RF.Append = true
 # appender.RF.Threshold = DEBUG
 # appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}
