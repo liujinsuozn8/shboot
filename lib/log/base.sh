@@ -32,13 +32,12 @@ export -f __populate_msg
 LogOutput(){
   # Usage: __print_log levelId msg shell method
   local levelId=$1
-
   if [[ $levelId -lt $Log_Root_Level ]]; then
     return 0
   fi
 
   local appenderName
-  for appenderName in ${Log_Global_Appender[@]}; do
+  for appenderName in ${Log_Global_Appenders[@]}; do
     # 1. check level
     eval local threshold=\${${appenderName}'_threshold'}
     if [[ $levelId -lt $threshold ]]; then

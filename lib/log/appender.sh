@@ -7,6 +7,7 @@ LogOutput_Console(){
   # Usage: LogOutput_Console appenderName msg
   echo "$2" 
 }
+export -f LogOutput_Console
 
 LogAppenderRegistry_Console(){
   # Usage LogAppenderRegistry_Console appenderName innerAppenderName settings
@@ -49,15 +50,16 @@ LogAppenderRegistry_Console(){
 
   # 1. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}'_logPattern'="\$logPattern"
+  eval export ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 2. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}'_threshold'=\$threshold
+    eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 }
+export -f LogAppenderRegistry_Console
 
 ############################################
 # RandomAccessFile
@@ -71,6 +73,7 @@ LogOutput_RandomAccessFile(){
 
   echo "$2" >> "$realFilePath"
 }
+export -f LogOutput_RandomAccessFile
 
 LogAppenderRegistry_RandomAccessFile(){
   # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
@@ -140,26 +143,27 @@ LogAppenderRegistry_RandomAccessFile(){
 
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}'_logPattern'="\$logPattern"
+  eval export ${innerAppenderName}'_logPattern'="\$logPattern"
 
   # 3. save threshold
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
-    eval ${innerAppenderName}'_threshold'=\$threshold
+    eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 
   # 4. save append
   if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}'_append'='true'
+    eval export ${innerAppenderName}'_append'='true'
   else
-    eval ${innerAppenderName}'_append'="\$append"
+    eval export ${innerAppenderName}'_append'="\$append"
   fi
   # if append is 'false', clear file
   if [ "$append" == 'false' ]; then
     File::ClearFile "$realFilePath"
   fi
 }
+export -f LogAppenderRegistry_RandomAccessFile
 
 prepareLogFilePath(){
   # Usage: prepareLogFilePath 'appenderName' 'timestamp'
@@ -189,6 +193,7 @@ prepareLogFilePath(){
 
   eval echo "$realFilePath"
 }
+export -f prepareLogFilePath
 
 initLogFile(){
   # Usage: initLogFile 'appenderName' 'filePath'
@@ -210,6 +215,7 @@ initLogFile(){
     fi
   fi
 }
+export -f initLogFile
 
 ############################################
 # RollingFile

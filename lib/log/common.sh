@@ -29,6 +29,11 @@ export Log__Type_RandomAccessFile='RandomAccessFile'
 export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
 ################################################################
+# registry appender
+# !!! Replace the array with a string that connected with IFS !!!
+export Log_Global_Appenders=''
+
+################################################################
 
 Log::PopulateTime(){
   # Usage: Log::PopulateTime "timestamp" "pattern"

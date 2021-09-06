@@ -18,7 +18,8 @@ declare -x  __boot__path="${__boot__libPath}/.."
 declare -x  __boot__fdPath=$(dirname <(echo))
 declare -ix __boot__fdLength=$(( ${#__boot__fdPath} + 1 ))
 # declare -ag __boot__importedFiles
-export __boot__importedFiles=( )
+# !!! Replace the array with a string that connected with IFS !!!
+export __boot__importedFiles=''
 
 System::WrapSource() {
   local libPath="$1"
@@ -37,15 +38,15 @@ System::SourceFile() {
   libPath="$(Builtin::AbsPath "$libPath")"
 
   if [[ -f "$libPath" ]]; then
+
     ## if already imported let's return
-    # if declare -f "Array::Contains" &> /dev/null &&
-    if [[ "${__boot__allowFileReloading-}" != true ]] && [[ ! -z "${__boot__importedFiles[*]}" ]] && Builtin::ArrayContains "$libPath" "${__boot__importedFiles[@]}"; then
+    # if declare -f "Builtin::ArrayContains" &> /dev/null &&
+    if [[ "${__boot__allowFileReloading-}" != true ]] && [[ ! -z "${__boot__importedFiles}" ]] && Builtin::ArrayContains "$libPath" ${__boot__importedFiles}; then
       return 0
     fi
 
-    # export __boot__importedFiles=(${__boot__importedFiles[@]})
-    __boot__importedFiles+=( "$libPath" )
-    export __boot__importedFiles=(${__boot__importedFiles[@]})
+    # __boot__importedFiles+=( "$libPath" )
+    __boot__importedFiles="$__boot__importedFiles"${IFS}"$libPath"
     __boot__importParent=$(dirname "$libPath") System::WrapSource "$libPath" "$@"
 
   else

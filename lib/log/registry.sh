@@ -7,10 +7,6 @@ import reflect/base
 import file/base
 
 ################################################################
-# registry appender
-export Log_Global_Appender=( )
-
-################################################################
 # common
 
 __isAvailableLevelStr(){
@@ -33,15 +29,14 @@ LogAppenderRegistry(){
   innerAppenderName="__log_appender_${appenderName}"
 
   # 2. check appender exist
-  Array::Contains "$innerAppenderName" "${Log_Global_Appender[@]}" && throw "Log Appender[$appenderName] has been registered" 
+  Array::Contains "$innerAppenderName" "${Log_Global_Appenders}" && throw "Log Appender[$appenderName] has been registered" 
 
   # 3. registry to cache
-  Log_Global_Appender+=("${innerAppenderName}")
-  export Log_Global_Appender=( ${Log_Global_Appender[@]} )
+  Log_Global_Appenders="$Log_Global_Appenders"${IFS}"$innerAppenderName"
 
   # 4. create appender
   # eval declare -Ag $innerAppenderName
-  eval ${innerAppenderName}'_type'=\${type}
+  eval export ${innerAppenderName}'_type'=\${type}
 
   # 5. init (if type is legal)
   if Reflect::isFunction "LogAppenderRegistry_${type}"; then
