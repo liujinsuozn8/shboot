@@ -45,3 +45,36 @@ String::Contains(){
   fi
 }
 export -f String::Contains
+
+String::LJust() {
+  # Usage: String::LJust 'width' 'string' 'fillchar'
+  # Usage: String::LJust 'width' 'string'
+  #        If the parameter: fillchar is not specified, spaces will be used
+  
+  local width=$1
+  local string="$2"
+
+  # if width <= 0 then return
+  if [ $width -le 0 ];then
+    echo "$string"
+    return 0
+  fi
+
+  local fillchar="${3- }"
+
+  # Trim Left And If Len(temp) <= width then return
+  local temp="${string#"${string%%[![:space:]]*}"}"
+  if [ ${#temp} -ge $width ];then
+    echo "$temp"
+    return 0
+  fi
+
+  # add replace string
+  : $((width = $width - ${#temp}))
+  # Original code: 
+  # x=$(printf "${fillchar}%.0s" ${width})
+  eval local repeatStr=\$\(printf \"${fillchar}%.0s\" {1\.\.${width}}\)
+
+  echo "${temp}${repeatStr}"
+}
+export -f String::LJust

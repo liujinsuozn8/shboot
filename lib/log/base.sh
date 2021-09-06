@@ -13,11 +13,10 @@ __populate_msg(){
   eval local logPattern=\${${appenderName}'_logPattern'}
   
   # 2. get paramter
-  local levelId="$2"
+  local level="$(String::LJust 5 "$2")"
   local msg="$3"
   local shell="$4"
   local method="$5"
-  local level="${Log__LevelStr[$levelId]}"
 
   # 3. Create time string And Replace time format with it
   # 3.1 Get timestamp
@@ -30,9 +29,9 @@ __populate_msg(){
 export -f __populate_msg
 
 LogOutput(){
-  # Usage: __print_log levelId msg shell method
+  # Usage: LogOutput levelId msg shell method
   local levelId=$1
-  if [[ $levelId -lt $Log_Root_Level ]]; then
+  if [[ ${!levelId} -lt $Log_Root_Level ]]; then
     return 0
   fi
 
@@ -40,7 +39,7 @@ LogOutput(){
   for appenderName in ${Log_Global_Appenders[@]}; do
     # 1. check level
     eval local threshold=\${${appenderName}'_threshold'}
-    if [[ $levelId -lt $threshold ]]; then
+    if [[ ${!levelId} -lt $threshold ]]; then
       continue
     fi
 

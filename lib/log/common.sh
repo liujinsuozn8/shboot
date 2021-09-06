@@ -6,20 +6,11 @@ export WARN=2
 export ERROR=3
 export FATAL=4
 
-declare -a Log__LevelStr
-Log__LevelStrStr[DEBUG]="DEBUG"
-Log__LevelStr[INFO]="INFO "
-Log__LevelStr[WARN]="WARN "
-Log__LevelStr[ERROR]="ERROR"
-Log__LevelStr[FATAL]="FATAL"
-export Log__LevelStr=( ${Log__LevelStr[@]} )
-
-
 ################################################################
-export Log_Root_Level=DEBUG
+export Log_Root_Level=$DEBUG
 
 # default value of log
-export Log__DefalutLevel=DEBUG
+export Log__DefalutLevel=$DEBUG
 #declare -g Log__DefalutLogTimeFormat='%Y/%m/%d %H:%M:%S'
 export Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
 export Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
