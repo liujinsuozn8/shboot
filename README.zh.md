@@ -271,6 +271,17 @@
     - `String::Contains "source" "target"`
         - 检查字符串 `source` 中是否包含 `target`
         - 执行检查: `if String::Contains "abcd" "bc"`
+    - `String::LJust 'width' 'string' 'fillchar'`
+        - 字符串左对齐，并在右侧使用指定字符填充到指定长度
+        - 参数
+            - width，对齐后的长度
+            - string，字符串
+            - fillchar，填充字符
+    - `String::LJust 'width' 'string'`
+        - 字符串左对齐，并在右侧使用**空格**填充到指定长度
+        - 参数
+            - width，对齐后的长度
+            - string，字符串
 
 - `import string/regex`
     - `Regex::Matcher "source" "pattern" num`
