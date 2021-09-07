@@ -1,5 +1,12 @@
 import string/regex
 
+Date::NowSecond(){
+  # Usage: Date::NowSecond
+  date '+%s'
+}
+export -f Date::NowSecond
+
+
 if [ "$(uname)" == 'Darwin' ]; then
   # for Mac
   Date::ToShellDateFormat(){
@@ -60,17 +67,29 @@ if [ "$(uname)" == 'Darwin' ]; then
   }
   export -f Date::NowTimestamp
 
-  Date::ZeroAMTimestramp(){
-    # Usage: Date::ZeroAMTimestramp
+  Date::TodayZeroAMSecond(){
+    # Usage: Date::TodayZeroAMSecond
     date -j -f "%Y%m%d%H%M%S" "$(date +%Y%m%d)000000" +%s
   }
-  export -f Date::ZeroAMTimestramp
+  export -f Date::TodayZeroAMSecond
+
+  Date::ZeroAMSecond(){
+    # Usage: Date::ZeroAMSecond 'timestamp'
+    # timestamp --> date ---> zero timestamp
+
+    # $(date -r ${a:0:10} '+%Y%m%d')   timestamp --> date
+    # date ---> 00:00:00 ---> zero timestamp
+    date -j -f "%Y%m%d%H%M%S" "$(date -r ${1:0:10} '+%Y%m%d')"'000000' +%s
+  }
+  export -f Date::ZeroAMSecond
 
   Date::Format(){
     # Usage Date::Format timestamp format
     # need handler SSS !!!
     local seconds="${1:0:10}"
     local nano="${1:10}"
+    nano=${nano:-'00000000'}
+
     local format=$(Date::ToShellDateFormat "$2")
     
     # Format for Mac:second --> result
@@ -86,6 +105,7 @@ if [ "$(uname)" == 'Darwin' ]; then
     echo "$result"
   }
   export -f Date::Format
+
 else
   # for Linux
 
@@ -146,11 +166,18 @@ else
   }
   export -f Date::NowTimestamp
 
-  Date::ZeroAMTimestramp(){
-    # Usage: Date::ZeroAMTimestramp
+  Date::TodayZeroAMSecond(){
+    # Usage: Date::TodayZeroAMTimestamp
     date -d "$(date +%F)" +%s
   }
-  export -f Date::ZeroAMTimestramp
+  export -f Date::TodayZeroAMSecond
+
+  Date::ZeroAMSecond(){
+    # Usage: Date::ZeroAMSecond 'timestamp/second'
+    # timestamp --> date ---> zero timestamp
+    date -d $(date -d @"${1:0:10}" '+%Y%m%d') +%s
+  }
+  export -f Date::ZeroAMSecond
 
   Date::Format(){
     # Usage Date::Format timestamp format
@@ -181,3 +208,16 @@ Date::FormatNow() {
   Date::Format "$timestamp" "$1"
 }
 export -f Date::FormatNow
+
+
+Date::ZeroAMTimestamp(){
+  # Usage: Date::ZeroAMSecond 'timestamp/second'
+  echo "$(Date::ZeroAMSecond $1)000000000"
+}
+export -f Date::ZeroAMTimestamp
+
+Date::TodayZeroAMTimestamp(){
+  # Usage: Date::TodayZeroAMTimestamp
+  echo "$(Date::TodayZeroAMSecond)000000000"
+}
+export -f Date::TodayZeroAMTimestamp

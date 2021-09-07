@@ -68,7 +68,11 @@ export -f LogAppenderRegistry_Console
 LogOutput_RandomAccessFile(){
   # Usage: LogOutput_RandomAccessFile appenderName msg
   local timestamp=$(Date::NowTimestamp)
-  local realFilePath=$(prepareLogFilePath "$1" "$timestamp")
+
+  eval local filePath=\${$1'_fileName'}
+
+  local realFilePath=$(populateLogFilePath "$filePath" "$timestamp")
+
   initLogFile "$1" "$realFilePath"
 
   echo "$2" >> "$realFilePath"
@@ -125,20 +129,17 @@ LogAppenderRegistry_RandomAccessFile(){
   done
 
   # 1. check and init file
-  # 1.1 empty check
-  [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
-
-  # 1.2 check parameter is a avaliable path of file
+  # 1.1 check parameter is a avaliable path of file
   if ! File::IsFilePathStr "$fileName" ; then
-    throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
+    throw "LogAppender ${appenderName}: Illegal fileName: ${fileName}  Please do not end with '..' or '/'"
   fi
 
-  # 1.3 populate time
+  # 1.2 populate time
   eval export ${innerAppenderName}'_fileName'="\$fileName"
   local timestamp=$(Date::NowTimestamp)
-  local realFilePath=$(prepareLogFilePath "$innerAppenderName" "$timestamp")
+  local realFilePath=$(populateLogFilePath "$fileName" "$timestamp")
 
-  # 1.4 init file
+  # 1.3 init file
   initLogFile "$innerAppenderName" "$realFilePath"
 
   # 2. save logPattern
@@ -153,7 +154,7 @@ LogAppenderRegistry_RandomAccessFile(){
   fi
 
   # 4. save append
-  if [ -z "$threshold" ]; then
+  if [ -z "$append" ]; then
     eval export ${innerAppenderName}'_append'='true'
   else
     eval export ${innerAppenderName}'_append'="\$append"
@@ -165,11 +166,11 @@ LogAppenderRegistry_RandomAccessFile(){
 }
 export -f LogAppenderRegistry_RandomAccessFile
 
-prepareLogFilePath(){
-  # Usage: prepareLogFilePath 'appenderName' 'timestamp'
-  local appenderName="$1"
+#########################################################
+populateLogFilePath(){
+  # Usage: populateLogFilePath 'filePath' 'timestamp'
+  local filePath="$1"
   local timestamp="$2"
-  eval local filePath=\${${appenderName}'_fileName'}
 
   # 1. populate time
   local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
@@ -193,7 +194,7 @@ prepareLogFilePath(){
 
   eval echo "$realFilePath"
 }
-export -f prepareLogFilePath
+export -f populateLogFilePath
 
 initLogFile(){
   # Usage: initLogFile 'appenderName' 'filePath'
@@ -223,7 +224,7 @@ export -f initLogFile
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
   # settings: 
-  #      -threshold, -logPattern, -fileName, -filePattern, -append
+  #      -threshold, -logPattern, -fileName, -filePattern
   #      -onStartupTriggeringPolicy, -sizeBasedTriggeringPolicy
   #      -timeBasedTriggeringPolicy, -dailyTriggeringPolicy
 
@@ -235,7 +236,6 @@ LogAppenderRegistry_RollingFile(){
   local logPattern
   local fileName
   local filePattern
-  local append
   local sizeBasedTriggeringPolicy
   local timeBasedTriggeringPolicy
   local dailyTriggeringPolicy
@@ -258,15 +258,6 @@ LogAppenderRegistry_RollingFile(){
       -logPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-      ;;
-
-      -append=*)
-        append="${1#*=}"
-        [ -z "$append" ] && throw "LogAppender [${appenderName}]: Append is empty"
-
-        if [ "$append" != 'true' ] && [ "$append" != 'false' ]; then
-          throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
-        fi
       ;;
 
       -fileName=*)
@@ -314,69 +305,198 @@ LogAppenderRegistry_RollingFile(){
     shift
   done
 
-  # 1. save Policy
+  # 1. check
+  # 1.1 Policy
+  # 1.1.1 check policy
+  # One of these three properties must be set, otherwise it cannot be started.
+  # Moreover, if `dailytriggingpolicy` is set, it can only be the string `true`
+  if [ -z "$sizeBasedTriggeringPolicy" ] && [ -z "$timeBasedTriggeringPolicy" ] && [ "$dailyTriggeringPolicy" != 'true' ]; then
+    throw "LogAppender ${appenderName}: No policy set. Pleace set 'SizeBasedTriggeringPolicy' or 'SimeBasedTriggeringPolicy' or 'DailyTriggeringPolicy = true'"
+  fi 
+
+  # 1.1.2 Set defalut value for Policy
+  # !!! sizeBasedTriggeringPolicy: default value is ''
+  # !!! timeBasedTriggeringPolicy: default value is ''
+
   if [ -z "$dailyTriggeringPolicy" ]; then
     dailyTriggeringPolicy='false'
-  fi
-
-  # check policy
-  if [ -z "$sizeBasedTriggeringPolicy" ] && [ -z "$timeBasedTriggeringPolicy" ] && [ -z "$dailyTriggeringPolicy" ]; then
-    throw "LogAppender ${appenderName}: No policy set. Pleace set 'SizeBasedTriggeringPolicy' or 'SimeBasedTriggeringPolicy' or 'DailyTriggeringPolicy = true'"
   fi 
   
   if [ -z "$onStartupTriggeringPolicy" ]; then
     onStartupTriggeringPolicy='false'
   fi
-  eval ${innerAppenderName}['sizeBasedTriggeringPolicy']="\$sizeBasedTriggeringPolicy"
-  eval ${innerAppenderName}['timeBasedTriggeringPolicy']=\$timeBasedTriggeringPolicy
-  eval ${innerAppenderName}['dailyTriggeringPolicy']=\$dailyTriggeringPolicy
-  eval ${innerAppenderName}['onStartupTriggeringPolicy']=\$onStartupTriggeringPolicy
 
-
-
-  # 1. check and init file
-  # 1.1 empty check
-  [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
-
-  # 1.2 check parameter is a avaliable path of file
-  if ! File::IsFilePathStr "$fileName" ; then
-    throw "LogAppender ${appenderName}: Illegal file: $1. Please do not end with '..' or '/'"
+  if [ ! -z "$timeBasedTriggeringPolicy" ]; then
+    timeBasedTriggeringPolicy=$(Log::TimeBasedToSecond "$timeBasedTriggeringPolicy")
   fi
 
-  # 1.3 populate time
-  eval ${innerAppenderName}['file']="\$fileName"
-  local realFilePath=$(prepareLogFilePath "$innerAppenderName")
+  # 1.2. File
+  # 1.2.1 check fileName is a avaliable path of file
+  if ! File::IsFilePathStr "$fileName" ; then
+    throw "LogAppender ${appenderName}: Illegal fileName: ${fileName}  Please do not end with '..' or '/'"
+  fi
 
-  # 1.4 init file
+  # 1.2.2 check fileName is a avaliable path of file
+  if ! File::IsFilePathStr "$filePattern" ; then
+    throw "LogAppender ${appenderName}: Illegal file: ${filePattern}  Please do not end with '..' or '/'"
+  fi
+
+  # 1.3 check logPattern
+  [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
+
+  # 1.4 filePattern: ${i} --> %i
+  local filePtnDir=$(File::Dirname "$filePattern")
+  # check: ${i}' can only be used in file names
+  if String::Contains "$filePtnDir" '${i}'; then
+    throw 'LogAppender [${appenderName}]: In filepattern, `%n` can only be used in file name, not directories. filePattern='${filePattern}
+  fi
+
+  local realFilePattern="${filePattern//\$\{i\}/%i}"
+  
+  #========================================================
+
+  # 2. create Second
+  local timestamp=$(Date::NowTimestamp)
+  local nowSecond=${timestamp:0:10}
+  local todayZeroAMSecond=$(Date::ZeroAMSecond "$timestamp")
+
+  #========================================================
+  # 3. save
+  # save zero second
+  eval export ${innerAppenderName}'_todayZeroAMSecond'="\$todayZeroAMSecond"
+
+  # save fileName
+  eval export ${innerAppenderName}'_fileName'="\$fileName"
+  # save filePattern
+  eval export ${innerAppenderName}'_filePattern'="\$realFilePattern"
+
+  # save Policy
+  eval export ${innerAppenderName}'_sizeBasedTriggeringPolicy'="\$sizeBasedTriggeringPolicy"
+  eval export ${innerAppenderName}'_timeBasedTriggeringPolicy'="\$timeBasedTriggeringPolicy"
+  eval export ${innerAppenderName}'_dailyTriggeringPolicy'="\$dailyTriggeringPolicy"
+  eval export ${innerAppenderName}'_onStartupTriggeringPolicy'="\$onStartupTriggeringPolicy"
+
+  # save logPattern
+  eval export ${innerAppenderName}'_logPattern'="\$logPattern"
+
+  # save threshold
+  if [ -z "$threshold" ]; then
+    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+  else
+    eval export ${innerAppenderName}'_threshold'=\$threshold
+  fi
+
+  #========================================================
+
+  # 4. check
+  # 4.1 filePattern
+  #     populate realFilePattern
+  local realFilePatternPath=$(populateLogFilePath "$realFilePattern" "$timestamp")
+  #     get directory from `realFilePatternPath`
+  local realFilePatternDir=$(File::Dirname "$realFilePatternPath")
+
+  #     try mkdir. stop when error
+  mkdir -p "$realFilePatternDir"
+  [ $? -ne 0 ] && throw 'LogAppender [${appenderName}]: FilePattern Error. Can not exec command: `mkdir `'$realFilePatternDir
+
+  #     check: Can create a file in realFilePatternDir
+  ! File::CanCreateFileInDir "$realFilePatternDir" && throw 'LogAppender [${appenderName}]: FilePattern Error. Permission denied'
+
+  # 4.2 Populate FileName
+  local realFilePath=$(populateLogFilePath "$fileName" "$timestamp")
+
+  # 4.3 Policy (if log exists)
+  if [ "$onStartupTriggeringPolicy" == 'true' ] && [ -f "$realFilePath" ]; then
+    local fileNameMTime="$(File::MTime "$realFilePath")"
+    local rolled='false'
+
+    if [ "$dailyTriggeringPolicy" == 'true' ] && [ $fileNameMTime -le $todayZeroAMSecond ]; then
+      Log::RollingLogFile "$realFilePatternPath" "$realFilePath"
+      rolled='true'
+    fi
+
+  echo "realFilePatternPath=$realFilePatternPath"
+  echo "realFilePatternDir=$realFilePatternDir"
+  echo "nowSecond=$nowSecond"
+  echo $[nowSecond - fileNameMTime]
+  echo "fileNameMTime=$fileNameMTime"
+  echo "timeBasedTriggeringPolicy=$timeBasedTriggeringPolicy"
+    if [ "$rolled" == 'false' ] && [ $[nowSecond - fileNameMTime] -ge $timeBasedTriggeringPolicy ];then
+      # TODO
+      # Log::RollingLogFile "$realFilePatternPath" "$realFilePath"
+      rolled='true'
+    fi
+  fi
+
+
   initLogFile "$innerAppenderName" "$realFilePath"
 
 
 
 
+# - 搜索出 filePattern 的位置 + 数量
+# - 如果文件存在，需要获取当前log的修改时间
+# - 如果log的修改时间 < todayZeroAMTimestamp
+#     - 滚动日志---> mv
+#     - 创建新的日志文件
 
 
-  # 2. save logPattern
-  [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
-  eval ${innerAppenderName}['logPattern']="\$logPattern"
 
-  # 3. save threshold
-  if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['threshold']=\$Log__DefalutLevel
-  else
-    eval ${innerAppenderName}['threshold']=\$threshold
-  fi
 
-  # 4. save append
-  if [ -z "$threshold" ]; then
-    eval ${innerAppenderName}['append']='true'
-  else
-    eval ${innerAppenderName}['append']="\$append"
-  fi
-  # if append is 'false', clear file
-  if [ "$append" == 'false' ]; then
-    File::ClearFile "$realFilePath"
-  fi
+
+
+#--------------------------------------------------
+  # save lastRollingTime
+  # local lastRollingTimestamp="${timestamp}"
+  # eval export ${innerAppenderName}'_lastRollingTimestamp'="\$lastRollingTimestamp"
+
+
+
+
 }
+
+Log::RollingLogFile(){
+  # Usage: Log::RollingLogFile 'filePattern' 'originPath'
+  local filePattern="$1"
+  local originPath="$2"
+  local rollFileRegex="^${filePattern//%i/[0-9]+}\$"
+
+  # 1. get count of rolled log
+  local logCount=$(File::GrepCountFromFilePath "$rollFileRegex")
+  ((logCount=logCount+1))
+
+  # 2. roll
+  mv "$originPath" "${filePattern//%i/${logCount}}"
+}
+
+Log::TimeBasedToSecond(){
+  # Usage Log::TimeBasedToSecond 'timeBased'
+  local unit=${1: -1}
+  local long=${1%?}
+  local base=0
+
+  # 10d
+  # 10H
+  # 10m
+  # 10s
+  case "$unit" in
+    d)
+      # base=60 * 60 * 24
+      base=86400
+    ;;
+    H)
+      base=3600
+    ;;
+    m)
+      base=60
+    ;;
+    s)
+      base=1
+    ;;
+  esac
+  awk 'BEGIN{print "'$long'" * "'$base'"}'
+}
+
 # appender.RF = RollingFile
 # appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
 # appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
@@ -400,4 +520,6 @@ LogAppenderRegistry_RollingFile(){
 #    get timestamp of today zero am
 #    if now > zero am
 # how to get last number of file
+
+# 20MB
 

@@ -42,19 +42,20 @@ export -f File::ClearFile
 
 File::ATime(){
   # Usage: File::ATime 'filePath'
-  stat -c %x "$1"
+  date -d "$(stat -c %x "$1")" +%s 
 }
 export -f File::ATime
 
 File::MTime(){
   # Usage: File::MTime 'filePath'
-  stat -c %y "$1"
+  # stat -c %y "$1"
+  date -d "$(stat -c %y "$1")" +%s 
 }
 export -f File::MTime
 
 File::CTime(){
   # Usage: File::CTime 'filePath'
-  stat -c %z "$1"
+  date -d "$(stat -c %z "$1")" +%s 
 }
 export -f File::CTime
 
@@ -111,6 +112,41 @@ File::AbsPath() {
 }
 export -f File::AbsPath
 
+File::CanCreateFileInDir() {
+  # Usage: File::CanCreateFileInDir 'dir'
+
+  # check1: $1 is a dir ?
+  [ ! -d "$1" ] && return 1
+
+  # check2: can create file?
+  [ -w "$1" ] && [ -x "$1" ] && return 0
+
+  # # can not create file
+  return 1
+}
+export -f File::CanCreateFileInDir
+
+File::GrepCountFromFilePath(){
+  # Usage: File::GrepCountFromFilePath 'filePathRegex'
+  local ptnDir="$(File::Dirname "$1")"
+  local ptnFile="$(File::Basename "$2")"
+  
+  File::GrepCountFromDir "$ptnDir" "$ptnFile"
+}
+export -f File::GrepCountFromFilePath
+
+File::GrepCountFromDir(){
+  # Usage: File::GrepCountFromDir 'dir' 'filenameRegex'
+  if [ ! -e "$1" ]; then
+    echo '0'
+    return 0
+  fi
+
+  ls "$1" | grep -E "$2" | wc -l
+}
+export -f File::GrepCountFromDir
+
+# ls test| grep -E 'qqq-[0-9]+.log$' | wc -l
 # while read -r line; do
 #   line=$(String_trim $line)
   

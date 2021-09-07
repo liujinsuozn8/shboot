@@ -70,7 +70,8 @@ String::LJust() {
   fi
 
   # add replace string
-  : $((width = $width - ${#temp}))
+  ((width=width+${#temp}))
+
   # Original code: 
   # x=$(printf "${fillchar}%.0s" ${width})
   eval local repeatStr=\$\(printf \"${fillchar}%.0s\" {1\.\.${width}}\)

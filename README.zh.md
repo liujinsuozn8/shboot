@@ -114,25 +114,21 @@
     # 2. 配置log文件路径
     appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
     # 3. 日志滚动时，旧日志的保存路径
-    appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
-    # 4. 启动时，文件的处理方式
-    # true: 不做处理，输出的 log 添加到文件末尾
-    # false: 启动后，将文件内容清空。输出的 log 添加到文件末尾
-    appender.RF.Append = true
-    # 5. 日志输出的最小级别
+    appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}-${i}.log
+    # 4. 日志输出的最小级别
     appender.RF.Threshold = DEBUG
-    # 6. 日志输出内容的模版字符串
+    # 5. 日志输出内容的模版字符串
     appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}
-    # 7. 日志滚动的策略
-    # 7.1-7.3 必须设置一个，否则无法启动。并且，如果设置了7.3值只能是 true
+    # 6. 日志滚动的策略
+    # 6.1-6.3 必须设置一个，否则无法启动。并且，如果设置了6.3值只能是 true
 
-    # 7.1 日志大小
+    # 6.1 日志大小
     appender.RF.Policies.SizeBasedTriggeringPolicy = 20MB
-    # 7.2 滚动日志的时间
+    # 6.2 滚动日志的时间
     appender.RF.Policies.TimeBasedTriggeringPolicy = 10h
-    # 7.3 是否按天执行日志滚动
+    # 6.3 是否按天执行日志滚动
     appender.RF.Policies.DailyTriggeringPolicy = true
-    # 7.4 是否在启动时执行滚动策略
+    # 6.4 是否在启动时执行滚动策略
     appender.RF.Policies.OnStartupTriggeringPolicy   = true
     ```
 
@@ -166,8 +162,25 @@
     |`${MM}`|2 位月||
     |`${dd}'`|2 位日期||
 
-- 每个参数，在 `LogPattern` 配置中都可以重复使用
-    - 填充 `LogPattern` 之前，会在环境中先创建好这些参数，然后通过 `eval` 实现填充
+- 每个参数，在 `FileName` 配置中都可以重复使用
+    - 填充 `FileName` 之前，会在环境中先创建好这些参数，然后通过 `eval` 实现填充
+
+### FilePattern 中提供的可用参数
+- 可用参数
+
+    |参数|内容|默认值|
+    |-|-|-|
+    |`${time}`, 或`${time}{日期格式字符串}`|日期|`yyyyMMdd-HHmmss`|
+    |`${yyyy}`|4 位年||
+    |`${yy}`|2 位年||
+    |`${MM}`|2 位月||
+    |`${dd}'`|2 位日期||
+    |`${i}'`|日志滚动的数量||
+
+- 对于 `${i}'` 以外的参数，在 `FilePattern` 配置中都可以重复使用
+    - 填充 `FilePattern` 之前，会在环境中先创建好这些参数，然后通过 `eval` 实现填充
+
+- 内置变量 `${i}`，**只能使用在文件上，不能使用在路径中。**如果使用在路径中，将会抛出异常并强制停止
 
 # 日期处理
 ## 实现方式
@@ -211,18 +224,25 @@
     - `Date::ToShellDateFormat 'yyyy/MM/dd'`
         - 将日期格式字符串转化为 `date` 指令的参数
     - `Date::NowTimestamp`
-        - 获取当前日期的时间戳
+        - 获取当前时间的时间戳
         - 时间戳的组成: `seconds(10位) + nanos(9位)`
         - 如：`1630735380012620800`
+    - `Date::NowSecond`
+        - 获取到当前时间的秒数
     - `Date::FormatNow 'foramt'`
         - 格式化当前日期
         - `format` 可以是：日期格式化字符串，或者 `date` 指令的参数
-    - `Date::Format 'timestamp' 'format'`
+    - `Date::Format 'timestamp/second' 'format'`
         - 格式化指定时间戳
         - `format` 可以是：日期格式化字符串，或者 `date` 指令的参数
-    - `Date::ZeroAMTimestramp`
-        - 获取当前日期的 0 点的时间戳
-
+    - `Date::TodayZeroAMTimestamp`
+        - 获取当前日期的 0 点时间戳
+    - `Date::TodayZeroAMSecond`
+        - 获取到当前日期的 0 点经过的秒数
+    - `Date::ZeroAMTimestamp 'timestamp/second'`
+        - 获取到**指定时间戳对应的那一天的** 0 点的时间戳
+    - `Date::ZeroAMSecond 'timestamp/second'`
+        - 获取到**指定时间戳对应的那一天的** 0 点的秒数
 ## lib/file
 - `import file/base`
     - `File::TryTouch 'filePath'`
@@ -238,19 +258,29 @@
         - 清空一个文件
     - `File::ATime 'filePath'`
         - 获取一个文件的 `Access Time`
+        - 返回一个10位的秒数
 
     - `File::MTime 'filePath'`
         - 获取一个文件的 `Modify Time`
+        - 返回一个10位的秒数
 
     - `File::CTime 'filePath'`
         - 获取一个文件的 `Change Time`
+        - 返回一个10位的秒数
     - `File::Basename 'path'`
         - 使用内置方法，从路径中获取 basename
     - `File::Dirname 'path'`
         - 使用内置方法，获取一个路径的目录
     - `File::AbsPath 'relative filename'`
         - 获取一个文件路径的绝对路径
-    
+    - `File::CanCreateFileInDir 'dir'`
+        - 检查能否在指定的路径下创建文件
+        - 执行判断: `if File::CanCreateFileInDir 'dir'; then`
+    - `File::GrepCountFromDir 'path' 'regexOfFilename'`
+        - 在指定路径下，检查符合规则的文件数量
+        - 如果 `path` 不存在，默认返回 `0`
+    - `File::GrepCountFromFilePath 'filePathRegex'`
+        - 检查符合 `filePathRegex` 规则的文件数量
 
 ## lib/relect
 - `import relect/base`
