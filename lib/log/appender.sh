@@ -348,7 +348,7 @@ LogAppenderRegistry_RollingFile(){
   local filePtnDir=$(File::Dirname "$filePattern")
   # check: ${i}' can only be used in file names
   if String::Contains "$filePtnDir" '${i}'; then
-    throw 'LogAppender [${appenderName}]: In filepattern, `%n` can only be used in file name, not directories. filePattern='${filePattern}
+    throw "LogAppender [${appenderName}]: In filepattern, \`%n\` can only be used in file name, not directories. filePattern=${filePattern}"
   fi
 
   local realFilePattern="${filePattern//\$\{i\}/%i}"
@@ -397,10 +397,10 @@ LogAppenderRegistry_RollingFile(){
 
   #     try mkdir. stop when error
   mkdir -p "$realFilePatternDir"
-  [ $? -ne 0 ] && throw 'LogAppender [${appenderName}]: FilePattern Error. Can not exec command: `mkdir `'$realFilePatternDir
+  [ $? -ne 0 ] && throw "LogAppender [${appenderName}]: FilePattern Error. Can not exec command: \`mkdir\` $realFilePatternDir"
 
   #     check: Can create a file in realFilePatternDir
-  ! File::CanCreateFileInDir "$realFilePatternDir" && throw 'LogAppender [${appenderName}]: FilePattern Error. Permission denied'
+  ! File::CanCreateFileInDir "$realFilePatternDir" && throw "LogAppender [${appenderName}]: FilePattern Error. Permission denied"
 
   # 4.2 Populate FileName
   local realFilePath=$(populateLogFilePath "$fileName" "$timestamp")
@@ -429,6 +429,7 @@ LogAppenderRegistry_RollingFile(){
   fi
 
 
+#####################
   initLogFile "$innerAppenderName" "$realFilePath"
 
 
