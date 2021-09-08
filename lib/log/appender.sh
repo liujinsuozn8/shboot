@@ -326,8 +326,18 @@ LogAppenderRegistry_RollingFile(){
     onStartupTriggeringPolicy='false'
   fi
 
+  #   unit str ----> second
   if [ ! -z "$timeBasedTriggeringPolicy" ]; then
-    timeBasedTriggeringPolicy=$(Log::TimeBasedToSecond "$timeBasedTriggeringPolicy")
+    timeBasedTriggeringPolicy=$(Date::TimeUnitStrToSecond "$timeBasedTriggeringPolicy")
+
+    [ $timeBasedTriggeringPolicy -eq 0 ] && throw "LogAppender ${appenderName}: Illegal TimeBasedTriggeringPolicy. TimeBasedTriggeringPolicy is 0 or cannot be resolved"
+  fi
+
+  #   unit str ----> size
+  if [ ! -z "$sizeBasedTriggeringPolicy" ]; then
+    sizeBasedTriggeringPolicy=$(File::SizeUnitStrToSize "$sizeBasedTriggeringPolicy")
+
+    [ $sizeBasedTriggeringPolicy -eq 0 ] && throw "LogAppender ${appenderName}: Illegal SizeBasedTriggeringPolicy. SizeBasedTriggeringPolicy is 0 or cannot be resolved"
   fi
 
   # 1.2. File
@@ -406,57 +416,69 @@ LogAppenderRegistry_RollingFile(){
   local realFilePath=$(populateLogFilePath "$fileName" "$timestamp")
 
   # 4.3 Policy (if log exists)
+  local realFilePathExist
+  local realFilePathMTime
+  if [ -f "$realFilePath" ]; then
+    realFilePathExist='true'
+    realFilePathMTime="$(File::MTime "$realFilePath")"
+  else
+    realFilePathExist='false'
+  fi
+
+  local lastRollingSecond
   if [ "$onStartupTriggeringPolicy" == 'true' ] && [ -f "$realFilePath" ]; then
-    local fileNameMTime="$(File::MTime "$realFilePath")"
     local rolled='false'
 
-    if [ "$dailyTriggeringPolicy" == 'true' ] && [ $fileNameMTime -le $todayZeroAMSecond ]; then
-      Log::RollingLogFile "$realFilePatternPath" "$realFilePath"
+    # 4.3.1 dailyTriggeringPolicy
+    if [ "$dailyTriggeringPolicy" == 'true' ] && [ $realFilePathMTime -le $todayZeroAMSecond ]; then
+      Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
       rolled='true'
+      lastRollingSecond="$nowSecond"
     fi
 
-  echo "realFilePatternPath=$realFilePatternPath"
-  echo "realFilePatternDir=$realFilePatternDir"
-  echo "nowSecond=$nowSecond"
-  echo $[nowSecond - fileNameMTime]
-  echo "fileNameMTime=$fileNameMTime"
-  echo "timeBasedTriggeringPolicy=$timeBasedTriggeringPolicy"
-    if [ "$rolled" == 'false' ] && [ $[nowSecond - fileNameMTime] -ge $timeBasedTriggeringPolicy ];then
-      # TODO
-      # Log::RollingLogFile "$realFilePatternPath" "$realFilePath"
+  # TODO
+  # echo "realFilePatternPath=$realFilePatternPath"
+  # echo "realFilePatternDir=$realFilePatternDir"
+  # echo "nowSecond=$nowSecond"
+  # echo $[nowSecond - realFilePathMTime]
+  # echo "realFilePathMTime=$realFilePathMTime"
+  # echo "timeBasedTriggeringPolicy=$timeBasedTriggeringPolicy"
+
+    # 4.3.2 timeBasedTriggeringPolicy
+    if [ "$rolled" == 'false' ] && [ ! -z "$timeBasedTriggeringPolicy" ] && [ $[nowSecond - realFilePathMTime] -ge $timeBasedTriggeringPolicy ];then
+      Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
       rolled='true'
+      lastRollingSecond="$nowSecond"
+    fi
+
+    # 4.3.3 sizeBasedTriggeringPolicy
+    if [ "$rolled" == 'false' ] && [ ! -z "$sizeBasedTriggeringPolicy" ]; then
+      local realFilePathSize="$(File::FileSize "$realFilePath")"
+      
+      if [ $realFilePathSize -ge $sizeBasedTriggeringPolicy ]; then
+        Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
+        rolled='true'
+        lastRollingSecond="$nowSecond"
+      fi
     fi
   fi
 
-
-#####################
+  # 4.4 init realFilePath
   initLogFile "$innerAppenderName" "$realFilePath"
 
-
-
-
-# - 搜索出 filePattern 的位置 + 数量
-# - 如果文件存在，需要获取当前log的修改时间
-# - 如果log的修改时间 < todayZeroAMTimestamp
-#     - 滚动日志---> mv
-#     - 创建新的日志文件
-
-
-
-
-
-
-#--------------------------------------------------
-  # save lastRollingTime
-  # local lastRollingTimestamp="${timestamp}"
-  # eval export ${innerAppenderName}'_lastRollingTimestamp'="\$lastRollingTimestamp"
-
-
-
+  # 5. save lastRollingSecond
+  if [ ! -z "$lastRollingSecond" ]; then
+    # !!! has been rolled in 4.3[onStartupTriggeringPolicy]
+    eval export ${innerAppenderName}'_lastRollingSecond'="\$lastRollingSecond"
+  elif [ -f "$realFilePath" ]; then
+    eval export ${innerAppenderName}'_lastRollingSecond'="\$realFilePathMTime"
+  else
+    eval export ${innerAppenderName}'_lastRollingSecond'="\$nowSecond"
+  fi
 
 }
 
-Log::RollingLogFile(){
+Log::DoRollingLogFile(){
   # Usage: Log::RollingLogFile 'filePattern' 'originPath'
   local filePattern="$1"
   local originPath="$2"
@@ -469,58 +491,3 @@ Log::RollingLogFile(){
   # 2. roll
   mv "$originPath" "${filePattern//%i/${logCount}}"
 }
-
-Log::TimeBasedToSecond(){
-  # Usage Log::TimeBasedToSecond 'timeBased'
-  local unit=${1: -1}
-  local long=${1%?}
-  local base=0
-
-  # 10d
-  # 10H
-  # 10m
-  # 10s
-  case "$unit" in
-    d)
-      # base=60 * 60 * 24
-      base=86400
-    ;;
-    H)
-      base=3600
-    ;;
-    m)
-      base=60
-    ;;
-    s)
-      base=1
-    ;;
-  esac
-  awk 'BEGIN{print "'$long'" * "'$base'"}'
-}
-
-# appender.RF = RollingFile
-# appender.RF.FileName = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
-# appender.RF.FilePattern = /logstest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log
-# appender.RF.Append = true
-# appender.RF.Threshold = DEBUG
-# appender.RF.LogPattern = ${time}{yyyy/MM/dd HH:mm:ss.SSS} [${level}] Method:[${shell}--${method}] Message:${msg}
-# appender.RF.Policies.OnStartupTriggeringPolicy   = true
-# appender.RF.Policies.SizeBasedTriggeringPolicy = 20MB
-#    compare size with SizeBasedTriggeringPolicy
-#    can check when startup
-# appender.RF.Policies.TimeBasedTriggeringPolicy = 10h
-#    save start time
-#    compare MTime with start time
-#    can not check when startup！！！
-# appender.RF.Policies.DailyTriggeringPolicy = true
-#    when shell start
-#       1. get file path
-#       2. save timestamp of today zero am in appender
-#    Each time the log is printed, get the current 0-point timestamp and compared with the timestamp that saved in the appender
-#         If do not same, save the new date and roll log
-#    get timestamp of today zero am
-#    if now > zero am
-# how to get last number of file
-
-# 20MB
-

@@ -1,3 +1,5 @@
+import string/regex
+
 File::TryTouch(){
   # Usage: File::TryTouch 'filePath'
 
@@ -147,6 +149,17 @@ if [ "$(uname)" == 'Darwin' ]; then
   }
   export -f File::CTime
 
+  File::FileSize(){
+    # Usage: File::FileSize 'filePath'
+    if [ ! -f "$1" ]; then
+      echo 0
+      return 0
+    fi
+
+    stat -f %z "$1"
+  }
+  export -f File::FileSize
+
 else
 
   File::ATime(){
@@ -166,9 +179,63 @@ else
     stat -c %Z "$1"
   }
   export -f File::CTime
+
+  File::FileSize(){
+    # Usage: File::FileSize 'filePath'
+    if [ ! -f "$1" ]; then
+      echo 0
+      return 0
+    fi
+
+    stat -c %s "$1"
+  }
+  export -f File::FileSize
+
 fi
 
+File::SizeUnitStrToSize() {
+  # Usage File::SizeUnitStrToSize 'sizeUnitStr'
+  local firstUnit=${1: -1}
+  local long=${1%?}
 
+  if [ "$firstUnit" != 'b' ] && [ "$firstUnit" != 'B' ]; then
+    return 0
+  fi
+
+  local secondUnit=${long: -1}
+  local unit
+  if Regex::IsInteger "$secondUnit" ;then
+    unit="$firstUnit"
+  else
+    unit="${secondUnit}${firstUnit}"
+    long=${long%?}
+  fi
+
+  local base=0
+  case "$unit" in
+    B|b)
+      base=1
+    ;;
+    KB|kb)
+      base=1024
+    ;;
+    MB|mb)
+      base=1048576
+    ;;
+    GB|gb)
+      base=1073741824
+    ;;
+    TB|tb)
+      base=1099511627776
+    ;;
+    PB|pb)
+      base=1125899906842600
+    ;;
+  esac
+
+  awk 'BEGIN{print "'$long'" * "'$base'"}'
+}
+export -f File::SizeUnitStrToSize
 # ls test| grep -E 'qqq-[0-9]+.log$' | wc -l
 # while read -r line; do
 #   line=$(String_trim $line)

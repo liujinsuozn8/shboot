@@ -11,6 +11,12 @@
     - 一些基础方法的实现
     - 中文版本：https://gitee.com/bingios/pure-bash-bible-zh_CN
 
+# 系统中必须要包含指令
+- stat
+- awk
+- grep
+- date
+
 # 在自定义 shell 中引入 shboot
 1. 使用当前工程，作为启动工程。或者将 `lib` 目录拷贝到自定义目录下
 2. 在 `lib` 的同级目录下创建自定义 shell
@@ -243,6 +249,16 @@
         - 获取到**指定时间戳对应的那一天的** 0 点的时间戳
     - `Date::ZeroAMSecond 'timestamp/second'`
         - 获取从 Epoch 到**指定时间戳对应的那一天的** 0 点的秒数
+    - `Date::TimeUnitStrToSeconds 'timeUnitStr'`
+        - 将日期字符串转换成**秒数**
+        - 支持的单位
+            - d, 天
+            - H, 小时
+            - m, 分钟
+            - s, 秒
+        - 不支持的单位将会返回 0
+        - 目前只支持**使用一个单位的数值**，如：`10d`, `5H`
+
 ## lib/file
 - `import file/base`
     - `File::TryTouch 'filePath'`
@@ -282,6 +298,17 @@
         - 如果 `path` 不存在，默认返回 `0`
     - `File::GrepCountFromFilePath 'filePathRegex'`
         - 检查符合 `filePathRegex` 规则的文件数量
+    - `File::FileSize 'filePath'`
+        - 获取文件的大小，单位 `B`
+    - `File::SizeUnitStrToSize 'sizeUnitStr'`
+        - 将存储容量字符串转换成**Byte单位**
+        - 支持的单位
+            - B, b
+            - KB, kb
+            - MB, mb
+            - GB, gb
+            - TB, tb
+            - PB, pb
 
 ## lib/relect
 - `import relect/base`
@@ -319,3 +346,5 @@
         - 使用正则表达式匹配，并返回第 `num` 个匹配结果
     - `Regex::Matcher "source" "pattern"`
         - 使用正则表达式匹配，并返回**所有的**匹配结果
+    - `Regex::IsInteger 'string'`
+        - 检查 `string` 是不是一个整数，开头可以是正负号:`+`, `-`

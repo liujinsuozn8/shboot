@@ -10,3 +10,13 @@ Regex::Matcher() {
   fi
 }
 export -f Regex::Matcher
+
+Regex::IsInteger(){
+  # Usage: Regex::IsInteger 'string'
+  if [[ $1 =~ ^[+-]?[0-9]+$ ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+export -f Regex::Matcher

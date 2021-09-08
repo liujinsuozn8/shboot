@@ -221,3 +221,32 @@ Date::TodayZeroAMTimestamp(){
   echo "$(Date::TodayZeroAMSecond)000000000"
 }
 export -f Date::TodayZeroAMTimestamp
+
+Date::TimeUnitStrToSecond(){
+  # Usage Date::TimeUnitStrToSecond 'timeString'
+  local unit=${1: -1}
+  local long=${1%?}
+  local base=0
+
+  # 10d
+  # 10H
+  # 10m
+  # 10s
+  case "$unit" in
+    d)
+      # base=60 * 60 * 24
+      base=86400
+    ;;
+    H)
+      base=3600
+    ;;
+    m)
+      base=60
+    ;;
+    s)
+      base=1
+    ;;
+  esac
+  awk 'BEGIN{print "'$long'" * "'$base'"}'
+}
+export -f Date::TimeUnitStrToSecond
