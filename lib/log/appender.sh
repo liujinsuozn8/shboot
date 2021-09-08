@@ -81,7 +81,7 @@ export -f LogOutput_Console
 
 LogAppenderRegistry_Console(){
   # Usage LogAppenderRegistry_Console appenderName innerAppenderName settings
-  # settings: -target, -threshold, -logPattern
+  # settings: -Target, -Threshold, -LogPattern
 
   local appenderName="$1"
   local innerAppenderName="$2"
@@ -92,11 +92,11 @@ LogAppenderRegistry_Console(){
 
   while [ $# -gt 0 ]; do
     case "$1" in
-      -target=*)
+      -Target=*)
       #  temp="${1#*=}"
       #  [ -z "$temp" ] && throw 'Target is empty'
       ;;
-      -threshold=*)
+      -Threshold=*)
         threshold="${1#*=}"
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
@@ -107,7 +107,7 @@ LogAppenderRegistry_Console(){
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
         fi
       ;;
-      -logPattern=*)
+      -LogPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
       ;;
@@ -151,7 +151,7 @@ export -f LogOutput_RandomAccessFile
 
 LogAppenderRegistry_RandomAccessFile(){
   # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
-  # settings: -threshold, -logPattern, -fileName, -append
+  # settings: -Threshold, -LogPattern, -FileName, -Append
 
   local appenderName="$1"
   local innerAppenderName="$2"
@@ -164,7 +164,7 @@ LogAppenderRegistry_RandomAccessFile(){
 
   while [ $# -gt 0 ]; do
     case "$1" in
-      -threshold=*)
+      -Threshold=*)
         threshold="${1#*=}"
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
@@ -175,11 +175,11 @@ LogAppenderRegistry_RandomAccessFile(){
           throw "LogAppender [${appenderName}]: Illegal threshold. Threshold must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $threshold"
         fi
       ;;
-      -logPattern=*)
+      -LogPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
       ;;
-      -append=*)
+      -Append=*)
         append="${1#*=}"
         [ -z "$append" ] && throw "LogAppender [${appenderName}]: Append is empty"
 
@@ -187,7 +187,7 @@ LogAppenderRegistry_RandomAccessFile(){
           throw "LogAppender [${appenderName}]: Illegal $append. Append must be one of [true, false]. Now is $append"
         fi
       ;;
-      -fileName=*)
+      -FileName=*)
         fileName="${1#*=}"
         [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
@@ -318,9 +318,9 @@ export -f LogOutput_RandomAccessFile
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
   # settings: 
-  #      -threshold, -logPattern, -fileName, -filePattern
-  #      -onStartupTriggeringPolicy, -sizeBasedTriggeringPolicy
-  #      -timeBasedTriggeringPolicy, -dailyTriggeringPolicy
+  #      -Threshold, -LogPattern, -FileName, -FilePattern
+  #      -PoliciesOnStartupTriggeringPolicy, -PoliciesSizeBasedTriggeringPolicy
+  #      -PoliciesOtimeBasedTriggeringPolicy, -PoliciesDailyTriggeringPolicy
 
   local appenderName="$1"
   local innerAppenderName="$2"
@@ -337,7 +337,7 @@ LogAppenderRegistry_RollingFile(){
 
   while [ $# -gt 0 ]; do
     case "$1" in
-      -threshold=*)
+      -Threshold=*)
         threshold="${1#*=}"
         [ -z "$threshold" ] && throw "LogAppender [${appenderName}]: Threshold is empty"
 
@@ -349,32 +349,32 @@ LogAppenderRegistry_RollingFile(){
         fi
       ;;
 
-      -logPattern=*)
+      -LogPattern=*)
         logPattern="${1#*=}"
         [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
       ;;
 
-      -fileName=*)
+      -FileName=*)
         fileName="${1#*=}"
         [ -z "$fileName" ] && throw "LogAppender [${appenderName}]: FileName is empty"
       ;;
 
-      -filePattern=*)
+      -FilePattern=*)
         filePattern="${1#*=}"
         [ -z "$filePattern" ] && throw "LogAppender [${appenderName}]: FilePattern is empty"
       ;;
 
-      -sizeBasedTriggeringPolicy=*)
+      -PoliciesSizeBasedTriggeringPolicy=*)
         sizeBasedTriggeringPolicy="${1#*=}"
         [ -z "$sizeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: SizeBasedTriggeringPolicy is empty"
       ;;
 
-      -timeBasedTriggeringPolicy=*)
+      -PoliciesTimeBasedTriggeringPolicy=*)
         timeBasedTriggeringPolicy="${1#*=}"
         [ -z "$timeBasedTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: TimeBasedTriggeringPolicy is empty"
       ;;
 
-      -dailyTriggeringPolicy=*)
+      -PoliciesDailyTriggeringPolicy=*)
         dailyTriggeringPolicy="${1#*=}"
         [ -z "$dailyTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: DailyTriggeringPolicy is empty"
 
@@ -383,7 +383,7 @@ LogAppenderRegistry_RollingFile(){
         fi
       ;;
 
-      -onStartupTriggeringPolicy=*)
+      -PoliciesOnStartupTriggeringPolicy=*)
         onStartupTriggeringPolicy="${1#*=}"
         [ -z "$onStartupTriggeringPolicy" ] && throw "LogAppender [${appenderName}]: OnStartupTriggeringPolicy is empty"
 

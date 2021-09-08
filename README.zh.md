@@ -313,6 +313,41 @@
             - TB, tb
             - PB, pb
 
+- `import file/properties`
+    - `Properties::Read 'filePath'`
+        - 读取 `*.properties` 文件，返回一个数组
+        - 返回内中，只返回非空行，非 `#` 开头的行
+        - 返回之后会变成一个字符串，需要在调用的位置重新转换成数组
+            ```sh
+            local a=( $(Properties::Read 'xxx/yyy.properties') )
+            ```
+        - 返回结果也可以不做转换，直接进行迭代
+            ```sh
+            local a=$(Properties::Read 'xxx/yyy.properties')
+
+            local b
+            for b in ${a[@]}; do
+              echo "$b"
+            done
+            ```
+    - `Properties::GetKeyAndValue 'filePath'`
+        - 读取 properties 文件，并按顺序返回文件中的 key + value
+            - 如果没有设置 value，将会抛出异常
+            - **方法内部抛出的异常将会终止整个shell 的运行，所以应该在 shell 的启动阶段执行，不应该在持续执行的阶段执行**
+        - 返回的数组中，每两个为一组，第一个是 key，第二个是 value
+            - 使用时，可以配合 `shift 2` 来使用
+            - 结果示例
+                ```sh
+                # properties 文件示例
+                a=aaa
+                b=bbb
+                ```
+                ```sh
+                # 解析结果
+                result=( 'a' 'aaa' 'b' 'bbb')
+                ```
+
+
 ## lib/relect
 - `import relect/base`
     - `Reflect::isFunction 'functionName'`
