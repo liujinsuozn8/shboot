@@ -68,12 +68,12 @@ Log::DoRollingLogFile(){
 }
 
 ############################################
-# Appender: onsole
+# Appender: Console
 ############################################
 
 LogOutput_Console(){
-  # Usage: LogOutput_Console appenderName msg
-  echo "$2" 
+  # Usage: LogOutput_Console appenderName timestamp msg
+  echo "$3"
 }
 export -f LogOutput_Console
 
@@ -134,8 +134,8 @@ export -f LogAppenderRegistry_Console
 ############################################
 
 LogOutput_RandomAccessFile(){
-  # Usage: LogOutput_RandomAccessFile appenderName msg
-  local timestamp=$(Date::NowTimestamp)
+  # Usage: LogOutput_RandomAccessFile appenderName timestamp msg
+  local timestamp="$2"
 
   eval local filePath=\${$1'_fileName'}
 
@@ -143,7 +143,7 @@ LogOutput_RandomAccessFile(){
 
   initLogFile "$1" "$realFilePath"
 
-  echo "$2" >> "$realFilePath"
+  echo "$3" >> "$realFilePath"
 }
 export -f LogOutput_RandomAccessFile
 
@@ -237,6 +237,82 @@ export -f LogAppenderRegistry_RandomAccessFile
 ############################################
 # Appender: RollingFile
 ############################################
+
+LogOutput_RollingFile(){
+  # Usage: LogOutput_RollingFile appenderName timestamp msg
+  local appenderName="$1"
+  local timestamp="$2"
+  local msg="$3"
+
+  # 1. populate filepath
+  eval local filePath=\${${appenderName}'_fileName'}
+  local realFilePath=$(populateLogFilePath "$filePath" "$timestamp")
+
+  # 2. populate filePattern
+  eval local filePattern=\${${appenderName}'_filePattern'}
+  local realFilePatternPath=$(populateLogFilePath "$filePattern" "$timestamp")
+
+  # 3. check roll policy
+  local rolled='false'
+  local nowSecond=${timestamp:0:10}
+  local lastRollingSecond
+  
+  # 3.1 dailyTriggeringPolicy
+  eval local dailyTriggeringPolicy=\${${appenderName}'_dailyTriggeringPolicy'}
+  if [ "$dailyTriggeringPolicy" == 'true' ]; then
+    local zeroAMSecond=$(Date::TodayZeroAMSecond)
+    eval local todayZeroAMSecond=\${${appenderName}'_todayZeroAMSecond'}
+
+    if [ "$zeroAMSecond" != "$todayZeroAMSecond" ]; then
+      Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
+      rolled='true'
+      lastRollingSecond="$nowSecond"
+
+      eval export \${${appenderName}'_todayZeroAMSecond'}=\${zeroAMSecond}
+    fi
+  fi
+
+  # 3.2 timeBasedTriggeringPolicy
+  if [ "$rolled" == 'false' ]; then
+    eval local timeBasedTriggeringPolicy=\${${appenderName}'_timeBasedTriggeringPolicy'}
+    eval lastRollingSecond=\${${appenderName}'_lastRollingSecond'}
+  
+    if [ ! -z "$timeBasedTriggeringPolicy" ] && [ $[nowSecond - lastRollingSecond] -ge $timeBasedTriggeringPolicy ];then
+      Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
+      rolled='true'
+      lastRollingSecond="$nowSecond"
+    fi
+  fi
+
+  # 3.3 sizeBasedTriggeringPolicy
+  if [ "$rolled" == 'false' ]; then
+    eval local sizeBasedTriggeringPolicy=\${${appenderName}'_sizeBasedTriggeringPolicy'}
+
+    if [ ! -z "$sizeBasedTriggeringPolicy" ]; then
+      local realFilePathSize="$(File::FileSize "$realFilePath")"
+      
+      if [ $realFilePathSize -ge $sizeBasedTriggeringPolicy ]; then
+        Log::DoRollingLogFile "$realFilePatternPath" "$realFilePath"
+        rolled='true'
+        lastRollingSecond="$nowSecond"
+      fi
+    fi
+  fi
+
+  # 4. save lastRollingSecond
+  if [ ! -z "$lastRollingSecond" ]; then
+    # !!! has been rolled in 3[Policy]
+    eval export ${appenderName}'_lastRollingSecond'="\$lastRollingSecond"
+  fi
+
+  # 5. init realFilePath
+  initLogFile "$appenderName" "$realFilePath"
+
+  # 6. output log
+  echo "$msg" >> "$realFilePath"
+}
+export -f LogOutput_RandomAccessFile
+
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
   # settings: 
@@ -451,14 +527,6 @@ LogAppenderRegistry_RollingFile(){
       rolled='true'
       lastRollingSecond="$nowSecond"
     fi
-
-  # TODO
-  # echo "realFilePatternPath=$realFilePatternPath"
-  # echo "realFilePatternDir=$realFilePatternDir"
-  # echo "nowSecond=$nowSecond"
-  # echo $[nowSecond - realFilePathMTime]
-  # echo "realFilePathMTime=$realFilePathMTime"
-  # echo "timeBasedTriggeringPolicy=$timeBasedTriggeringPolicy"
 
     # 4.3.2 timeBasedTriggeringPolicy
     if [ "$rolled" == 'false' ] && [ ! -z "$timeBasedTriggeringPolicy" ] && [ $[nowSecond - realFilePathMTime] -ge $timeBasedTriggeringPolicy ];then

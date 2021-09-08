@@ -70,7 +70,7 @@ String::LJust() {
   fi
 
   # add replace string
-  ((width=width+${#temp}))
+  ((width=width-${#temp}))
 
   # Original code: 
   # x=$(printf "${fillchar}%.0s" ${width})

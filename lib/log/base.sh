@@ -6,21 +6,20 @@ import string/base
 
 ########################################
 __populate_msg(){
-  # __populate__log appenderName levelId msg shell method
+  # __populate__log appenderName timestamp levelId msg shell method
   local appenderName="$1"
+  local timestamp="$2"
 
   # 1. get config of appender
   eval local logPattern=\${${appenderName}'_logPattern'}
   
   # 2. get paramter
-  local level="$(String::LJust 5 "$2")"
-  local msg="$3"
-  local shell="$4"
-  local method="$5"
+  local level="$(String::LJust 5 "$3")"
+  local msg="$4"
+  local shell="$5"
+  local method="$6"
 
   # 3. Create time string And Replace time format with it
-  # 3.1 Get timestamp
-  local timestamp=$(Date::NowTimestamp)
   logPattern=$(Log::PopulateTime "$timestamp" "$logPattern")
 
   # 4. populate message
@@ -35,6 +34,9 @@ LogOutput(){
     return 0
   fi
 
+  # Get timestamp
+  local timestamp=$(Date::NowTimestamp)
+
   local appenderName
   for appenderName in ${Log_Global_Appenders[@]}; do
     # 1. check level
@@ -44,11 +46,11 @@ LogOutput(){
     fi
 
     # 2. populate msg
-    local msg=$(__populate_msg "$appenderName" "$@")
+    local msg=$(__populate_msg "$appenderName" "$timestamp" "$@")
 
     # 3. output log （to console or file）
     eval local appenderType=\${${appenderName}'_type'}
-    eval "LogOutput_${appenderType}" "\$appenderName" "\$msg"
+    eval "LogOutput_${appenderType}" "\$appenderName" "\$timestamp" "\$msg"
   done
 }
 export -f LogOutput
