@@ -17,6 +17,9 @@
 - grep
 - date
 
+# 开发过程中需要注意的问题
+- [/shboot/memo/zh](/shboot/memo/zh)
+
 # 在自定义 shell 中引入 shboot
 1. 使用当前工程，作为启动工程。或者将 `lib` 目录拷贝到自定义目录下
 2. 在 `lib` 的同级目录下创建自定义 shell

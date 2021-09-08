@@ -547,17 +547,17 @@ LogAppenderRegistry_RollingFile(){
     fi
   fi
 
-  # 4.4 init realFilePath
-  initLogFile "$innerAppenderName" "$realFilePath"
 
   # 5. save lastRollingSecond
   if [ ! -z "$lastRollingSecond" ]; then
     # !!! has been rolled in 4.3[onStartupTriggeringPolicy]
     eval export ${innerAppenderName}'_lastRollingSecond'="\$lastRollingSecond"
-  elif [ -f "$realFilePath" ]; then
+  elif [ "$realFilePathExist" == 'true' ]; then
     eval export ${innerAppenderName}'_lastRollingSecond'="\$realFilePathMTime"
   else
     eval export ${innerAppenderName}'_lastRollingSecond'="\$nowSecond"
   fi
 
+  # 6 init realFilePath
+  initLogFile "$innerAppenderName" "$realFilePath"
 }
