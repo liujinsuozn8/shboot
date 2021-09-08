@@ -228,7 +228,7 @@
         - 时间戳的组成: `seconds(10位) + nanos(9位)`
         - 如：`1630735380012620800`
     - `Date::NowSecond`
-        - 获取到当前时间的秒数
+        - 获取从 Epoch 到当前时间的秒数
     - `Date::FormatNow 'foramt'`
         - 格式化当前日期
         - `format` 可以是：日期格式化字符串，或者 `date` 指令的参数
@@ -238,11 +238,11 @@
     - `Date::TodayZeroAMTimestamp`
         - 获取当前日期的 0 点时间戳
     - `Date::TodayZeroAMSecond`
-        - 获取到当前日期的 0 点经过的秒数
+        - 获取从 Epoch 到当前日期的 0 点经过的秒数
     - `Date::ZeroAMTimestamp 'timestamp/second'`
         - 获取到**指定时间戳对应的那一天的** 0 点的时间戳
     - `Date::ZeroAMSecond 'timestamp/second'`
-        - 获取到**指定时间戳对应的那一天的** 0 点的秒数
+        - 获取从 Epoch 到**指定时间戳对应的那一天的** 0 点的秒数
 ## lib/file
 - `import file/base`
     - `File::TryTouch 'filePath'`
@@ -258,15 +258,16 @@
         - 清空一个文件
     - `File::ATime 'filePath'`
         - 获取一个文件的 `Access Time`
-        - 返回一个10位的秒数
+        - 返回从 Epoch 到 `Access` 的秒数
 
     - `File::MTime 'filePath'`
         - 获取一个文件的 `Modify Time`
-        - 返回一个10位的秒数
+        - 返回从 Epoch 到 `Modify` 的秒数
 
     - `File::CTime 'filePath'`
         - 获取一个文件的 `Change Time`
-        - 返回一个10位的秒数
+        - 返回从 Epoch 到 `Change` 的秒数
+
     - `File::Basename 'path'`
         - 使用内置方法，从路径中获取 basename
     - `File::Dirname 'path'`

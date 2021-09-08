@@ -40,26 +40,6 @@ File::ClearFile(){
 }
 export -f File::ClearFile
 
-File::ATime(){
-  # Usage: File::ATime 'filePath'
-  date -d "$(stat -c %x "$1")" +%s 
-}
-export -f File::ATime
-
-File::MTime(){
-  # Usage: File::MTime 'filePath'
-  # stat -c %y "$1"
-  date -d "$(stat -c %y "$1")" +%s 
-}
-export -f File::MTime
-
-File::CTime(){
-  # Usage: File::CTime 'filePath'
-  date -d "$(stat -c %z "$1")" +%s 
-}
-export -f File::CTime
-
-
 File::Basename() {
   # from: https://github.com/dylanaraps/pure-bash-bible
   # Usage: File::Basename "path" ["fileSuffix"]
@@ -145,6 +125,49 @@ File::GrepCountFromDir(){
   ls "$1" | grep -E "$2" | wc -l
 }
 export -f File::GrepCountFromDir
+
+# Compatible with MAC OS
+if [ "$(uname)" == 'Darwin' ]; then
+  # for Mac
+  File::ATime(){
+    # Usage: File::ATime 'filePath'
+    stat -f '%a' "$1"
+  }
+  export -f File::ATime
+
+  File::MTime(){
+    # Usage: File::MTime 'filePath'
+    stat -f '%m' "$1"
+  }
+  export -f File::MTime
+
+  File::CTime(){
+    # Usage: File::CTime 'filePath'
+    stat -f '%c' "$1"
+  }
+  export -f File::CTime
+
+else
+
+  File::ATime(){
+    # Usage: File::ATime 'filePath'
+    stat -c %X "$1"
+  }
+  export -f File::ATime
+
+  File::MTime(){
+    # Usage: File::MTime 'filePath'
+    stat -c %Y "$1"
+  }
+  export -f File::MTime
+
+  File::CTime(){
+    # Usage: File::CTime 'filePath'
+    stat -c %Z "$1"
+  }
+  export -f File::CTime
+fi
+
 
 # ls test| grep -E 'qqq-[0-9]+.log$' | wc -l
 # while read -r line; do
