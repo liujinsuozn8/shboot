@@ -1,6 +1,74 @@
 
+#########################################################
+# common
+#########################################################
+populateLogFilePath(){
+  # Usage: populateLogFilePath 'filePath' 'timestamp'
+  local filePath="$1"
+  local timestamp="$2"
+
+  # 1. populate time
+  local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
+
+  # 2. extend parameter 
+  if String::Contains "$realFilePath" '${yyyy}'; then
+    local yyyy=$(Date::Format "$timestamp" "yyyy")
+  fi
+
+  if String::Contains "$realFilePath" '${yy}'; then
+    local yy=$(Date::Format "$timestamp" "yy")
+  fi
+
+  if String::Contains "$realFilePath" '${MM}'; then
+    local MM=$(Date::Format "$timestamp" "MM")
+  fi
+
+  if String::Contains "$realFilePath" '${dd}'; then
+    local dd=$(Date::Format "$timestamp" "dd")
+  fi
+
+  eval echo "$realFilePath"
+}
+export -f populateLogFilePath
+
+initLogFile(){
+  # Usage: initLogFile 'appenderName' 'filePath'
+  # check file is writable
+  if [ -e "$2" ]; then
+    # check this path is a file
+    if [ ! -f "$2" ]; then
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
+    fi
+    # check writable
+    if [ ! -w "$2" ]; then
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
+    fi
+  else
+    # try to create file
+    File::TryTouch "$2"
+    if [ $? -ne 0 ]; then
+      throw "LogAppender ${1}: Illegal file: ${2}. Can not create."
+    fi
+  fi
+}
+export -f initLogFile
+
+Log::DoRollingLogFile(){
+  # Usage: Log::RollingLogFile 'filePattern' 'originPath'
+  local filePattern="$1"
+  local originPath="$2"
+  local rollFileRegex="^${filePattern//%i/[0-9]+}\$"
+
+  # 1. get count of rolled log
+  local logCount=$(File::GrepCountFromFilePath "$rollFileRegex")
+  ((logCount=logCount+1))
+
+  # 2. roll
+  mv "$originPath" "${filePattern//%i/${logCount}}"
+}
+
 ############################################
-# Console
+# Appender: onsole
 ############################################
 
 LogOutput_Console(){
@@ -62,7 +130,7 @@ LogAppenderRegistry_Console(){
 export -f LogAppenderRegistry_Console
 
 ############################################
-# RandomAccessFile
+# Appender: RandomAccessFile
 ############################################
 
 LogOutput_RandomAccessFile(){
@@ -166,60 +234,8 @@ LogAppenderRegistry_RandomAccessFile(){
 }
 export -f LogAppenderRegistry_RandomAccessFile
 
-#########################################################
-populateLogFilePath(){
-  # Usage: populateLogFilePath 'filePath' 'timestamp'
-  local filePath="$1"
-  local timestamp="$2"
-
-  # 1. populate time
-  local realFilePath=$(Log::PopulateTime "$timestamp" "$filePath")
-
-  # 2. extend parameter 
-  if String::Contains "$realFilePath" '${yyyy}'; then
-    local yyyy=$(Date::Format "$timestamp" "yyyy")
-  fi
-
-  if String::Contains "$realFilePath" '${yy}'; then
-    local yy=$(Date::Format "$timestamp" "yy")
-  fi
-
-  if String::Contains "$realFilePath" '${MM}'; then
-    local MM=$(Date::Format "$timestamp" "MM")
-  fi
-
-  if String::Contains "$realFilePath" '${dd}'; then
-    local dd=$(Date::Format "$timestamp" "dd")
-  fi
-
-  eval echo "$realFilePath"
-}
-export -f populateLogFilePath
-
-initLogFile(){
-  # Usage: initLogFile 'appenderName' 'filePath'
-  # check file is writable
-  if [ -e "$2" ]; then
-    # check this path is a file
-    if [ ! -f "$2" ]; then
-      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
-    fi
-    # check writable
-    if [ ! -w "$2" ]; then
-      throw "LogAppender ${1}: Illegal file: ${2}. Can not write."
-    fi
-  else
-    # try to create file
-    File::TryTouch "$2"
-    if [ $? -ne 0 ]; then
-      throw "LogAppender ${1}: Illegal file: ${2}. Can not create."
-    fi
-  fi
-}
-export -f initLogFile
-
 ############################################
-# RollingFile
+# Appender: RollingFile
 ############################################
 LogAppenderRegistry_RollingFile(){
   # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
@@ -476,18 +492,4 @@ LogAppenderRegistry_RollingFile(){
     eval export ${innerAppenderName}'_lastRollingSecond'="\$nowSecond"
   fi
 
-}
-
-Log::DoRollingLogFile(){
-  # Usage: Log::RollingLogFile 'filePattern' 'originPath'
-  local filePattern="$1"
-  local originPath="$2"
-  local rollFileRegex="^${filePattern//%i/[0-9]+}\$"
-
-  # 1. get count of rolled log
-  local logCount=$(File::GrepCountFromFilePath "$rollFileRegex")
-  ((logCount=logCount+1))
-
-  # 2. roll
-  mv "$originPath" "${filePattern//%i/${logCount}}"
 }
