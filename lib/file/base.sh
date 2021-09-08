@@ -113,7 +113,7 @@ File::GrepCountFromFilePath(){
   local ptnDir=$(File::Dirname "$1")
   local ptnFile=$(File::Basename "$1")
 
-  File::GrepCountFromDir "$ptnDir" "$ptnFile"
+  File::GrepCountFromDir "$ptnDir" "^${ptnFile}\$"
 }
 export -f File::GrepCountFromFilePath
 
@@ -236,6 +236,7 @@ File::SizeUnitStrToSize() {
   awk 'BEGIN{print "'$long'" * "'$base'"}'
 }
 export -f File::SizeUnitStrToSize
+
 # ls test| grep -E 'qqq-[0-9]+.log$' | wc -l
 # while read -r line; do
 #   line=$(String_trim $line)
