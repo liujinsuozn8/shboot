@@ -57,7 +57,7 @@ Log::DoRollingLogFile(){
   # Usage: Log::RollingLogFile 'filePattern' 'originPath'
   local filePattern="$1"
   local originPath="$2"
-  local rollFileRegex="^${filePattern//%i/[0-9]+}\$"
+  local rollFileRegex="${filePattern//%i/[0-9]+}"
 
   # 1. get count of rolled log
   local logCount=$(File::GrepCountFromFilePath "$rollFileRegex")

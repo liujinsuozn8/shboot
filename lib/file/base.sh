@@ -110,9 +110,9 @@ export -f File::CanCreateFileInDir
 
 File::GrepCountFromFilePath(){
   # Usage: File::GrepCountFromFilePath 'filePathRegex'
-  local ptnDir="$(File::Dirname "$1")"
-  local ptnFile="$(File::Basename "$2")"
-  
+  local ptnDir=$(File::Dirname "$1")
+  local ptnFile=$(File::Basename "$1")
+
   File::GrepCountFromDir "$ptnDir" "$ptnFile"
 }
 export -f File::GrepCountFromFilePath
