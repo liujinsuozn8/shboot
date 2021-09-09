@@ -33,6 +33,7 @@ Log::AppenderRegistry(){
     throw "Log Appender[$appenderName]: Can not resolve this type: ${type}"
   fi
 }
+export -f Log::AppenderRegistry
 
 Log::AppenderIsRegistered(){
   # Usage Log::AppenderIsRegistered 'appenderName'
@@ -49,3 +50,4 @@ Log::AppenderIsRegistered(){
     return 0
   fi
 }
+export -f Log::AppenderIsRegistered

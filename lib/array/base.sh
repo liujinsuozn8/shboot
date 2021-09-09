@@ -1,10 +1,13 @@
 Array::Contains() {
   # From: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
   # Usage: Array::Contains "target" "${list[@]}"
+  local target="$1"
+  shift 1
+
   local element
-  for element in "${@:2}"
+  for element in "${@}"
   do
-    [[ "$element" = "$1" ]] && return 0
+    [[ "$element" = "$target" ]] && return 0
   done
   return 1
 }
