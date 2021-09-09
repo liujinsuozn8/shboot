@@ -124,7 +124,7 @@ Log::AppenderRegistry_Console(){
 
   # 2. save threshold
   if [ -z "$threshold" ]; then
-    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log_Root_Level
   else
     eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
@@ -218,7 +218,7 @@ Log::AppenderRegistry_RandomAccessFile(){
 
   # 4. save threshold
   if [ -z "$threshold" ]; then
-    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log_Root_Level
   else
     eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
@@ -489,7 +489,7 @@ Log::AppenderRegistry_RollingFile(){
 
   # save threshold
   if [ -z "$threshold" ]; then
-    eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
+    eval export ${innerAppenderName}'_threshold'=\$Log_Root_Level
   else
     eval export ${innerAppenderName}'_threshold'=\$threshold
   fi

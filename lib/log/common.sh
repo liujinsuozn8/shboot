@@ -9,8 +9,6 @@ export FATAL=4
 ################################################################
 export Log_Root_Level=$DEBUG
 
-# default value of log
-export Log__DefalutLevel=$DEBUG
 #declare -g Log__DefalutLogTimeFormat='%Y/%m/%d %H:%M:%S'
 export Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
 export Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'

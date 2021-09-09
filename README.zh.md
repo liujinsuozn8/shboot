@@ -128,8 +128,13 @@
     3. `RollingFile`，滚动日志，需要手动配置滚动策略
 - 配置说明
     ```sh
-    ### 设置###
-    rootLogger = debug,stdout,D,E
+    ### 设置 ###
+    # rootLogger = 日志级别, appenderName1,appenderName2...
+    rootLogger = debug,stdout,RAF
+    # 1. 这里配置了 stdout,RAF，加载时，将会忽略下面的 RF
+
+    # 2. 以下所有 appender，如果设置了 Threshold，
+    # 将会覆盖 rootLogger 中的日志级别
     
     ######################## Console ########################
     # 1. 配置输出器类型，需要注意大小写

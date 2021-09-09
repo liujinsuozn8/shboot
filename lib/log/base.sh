@@ -30,9 +30,6 @@ export -f __populate_msg
 Log::Output(){
   # Usage: Log::Output levelId msg shell method
   local levelId=$1
-  if [[ ${!levelId} -lt $Log_Root_Level ]]; then
-    return 0
-  fi
 
   # Get timestamp
   local timestamp=$(Date::NowTimestamp)
