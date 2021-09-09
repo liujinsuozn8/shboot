@@ -81,8 +81,26 @@
     Log::FATAL 'test fatal'
     ```
 
+## 自动加载
+### 自动加载默认的控制台log输出器
+- 使用方式
+    ```sh
+    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+    import log/load/default
+
+    Log::DEBUG 'aaa'
+    Log::INFO 'bbb'
+    Log::WARN 'ccc'
+    Log::ERROR 'ddd'
+    Log::FATAL 'eee'
+    ```
+- 使用的log模版
+    ```sh
+    ```
+
 ## 日志的配置方法
-### 默认log输出器的配追
+### 默认log输出器的配置
 - 现在只提供三种
     1. `Console`，在控制台打印日志
     2. `RandomAccessFile`，输出到指定文件
@@ -227,6 +245,9 @@
 - `import array/base`
     - `Array::Contains "target" "${list[@]}"`
         - 检查集合 `list` 中是否包含 `target`
+    - `Array::Join 'joinStr' "${array[@]}"`
+        - 用 `joinStr` 连接数组的每一个元素，并返回连接结果
+        - 其他调用方式: `Array::Join 'joinStr' 'aaa' 'bbb' 'ccc'`
 
 ## lib/date
 - `import date/base`

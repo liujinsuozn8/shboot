@@ -59,11 +59,10 @@ export -f Log::PopulateTime
 
 Log::isAvailableLevelStr(){
   # Usage: Log::isAvailableLevelStr 'levelStr'
-  code=${!1}
-  if [ -z "$code" ]; then
-    return 1
-  else
+  if [[ $1 =~ ^(DEBUG|INFO|WARN|ERROR|FATAL)$ ]]; then
     return 0
+  else
+    return 1
   fi
 }
 export -f Log::isAvailableLevelStr

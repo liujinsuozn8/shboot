@@ -9,3 +9,13 @@ Array::Contains() {
   return 1
 }
 export -f Array::Contains
+
+Array::Join(){
+  # Usage: Array::Join 'joinStr' "${array[@]}"
+  # Usage: Array::Join 'joinStr' 'aaa' 'bbb' 'ccc'
+
+  local IFS="$1"
+  shift 1
+  echo "$*"
+}
+export -f Array::Join

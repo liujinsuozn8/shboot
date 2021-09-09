@@ -33,3 +33,7 @@
 
 # 终止程序
 `$()` 内调用的指定中的 `exit 非0值` 无法停止外部的 shell，只能通过 `kill -s TERM "$$"` 来停止
+
+# true/false
+- `0=true`
+- `1=false`
