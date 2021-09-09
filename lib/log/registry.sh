@@ -33,3 +33,19 @@ Log::AppenderRegistry(){
     throw "Log Appender[$appenderName]: Can not resolve this type: ${type}"
   fi
 }
+
+Log::AppenderIsRegistered(){
+  # Usage Log::AppenderIsRegistered 'appenderName'
+  local appenderName="$1"
+
+  if [ "$appenderName" != '__log_appender_'* ]; then
+    appenderName="__log_appender_${appenderName}"
+  fi
+
+  eval local appenderType=\${${appenderName}'_type'}
+  if [ -z "$appenderType" ]; then
+    return 1
+  else
+    return 0
+  fi
+}

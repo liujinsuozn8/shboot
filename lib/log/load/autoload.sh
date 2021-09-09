@@ -22,6 +22,7 @@ __findRootLogger(){
   done
 }
 
+###########################
 
 kvs=( $(Properties::GetKeyAndValue "${PROJECT_ROOT}/resource/log.properties") )
 rootLogger=$(__findRootLogger "${kvs[@]}")
@@ -34,7 +35,7 @@ rootLogger=( ${rootLogger//,/$IFS} )
 logLevelStr=$(String::Trim "${rootLogger[0]}")
 
 if Log::isAvailableLevelStr "$logLevelStr"; then
-  export Log__DefalutLevel=${!logLevelStr}
+  export Log_Root_Level=${!logLevelStr}
 else
   throw "Unable to load :${PROJECT_ROOT}/resource/log.properties.\nIllegal rootLogger. LogLevel must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $logLevelStr"
 fi
@@ -90,3 +91,9 @@ for (( i=0; i<${#kvs[@]}; i++)) do
 done
 
 Array::Contains "$lastAppenderName" "${rootAppenders[@]}" && Log::AppenderRegistry "$lastAppenderName" "$appenderType" "${parameters[@]}"
+
+for appender in ${rootAppenders[@]}; do
+  if ! Log::AppenderIsRegistered "$appender" ; then
+    throw "Unable to load :${PROJECT_ROOT}/resource/log.properties.\nIllegal rootLogger. The configuration of appender:[${appender}] does not exist"
+  fi
+done
