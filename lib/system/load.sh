@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 export PROJECT_ROOT=$( cd ${BASH_SOURCE[0]%/*}/../.. && pwd )
 export PROJECT_PID="$$"
 

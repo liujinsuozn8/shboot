@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 import file/properties
 import string/base
 import array/base

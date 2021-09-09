@@ -1,4 +1,8 @@
 
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 if [ "$__boot__bootstrapped" == true ]; then
   return 0
 fi

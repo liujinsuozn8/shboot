@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 import log/base
 import log/registry
 import log/appender

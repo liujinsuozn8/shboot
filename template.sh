@@ -22,47 +22,19 @@ Exit Code:
 USAGE
 }
 
-#----------------------------
-# static paramter
-#----------------------------
-export EXEC_ROOT="$(cd `dirname $0`;pwd)"
-
-#----------------------------
-# import
-#----------------------------
-. "${EXEC_ROOT}/logger.sh"
-
-#----------------------------
-# function
-#----------------------------
-
-#----------------------------
-# param
-#----------------------------
-# 1. param define
-# 2. param analyze
-while [ $# -gt 0 ];do
-    case "$1" in
-        --help)
-            usage
-            exit 0
-        ;;
-        *)
-            echoerr "$1 can not analyze !!! please get help by [ --help ]"
-            errend
-        ;;
-    esac
-    shift 2
-done
-
-loginfo "$SHELL_EXEC_DIR"
-logerr "$SHELL_EXEC_DIR"
-
-
-#----------------------------
+#---------------------
 # main
-#----------------------------
-# 1. process1
-# 2. process2
-# .....
-# n. processn
+#---------------------
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/load/autoload
+
+Log::DEBUG 'aaa'
+
+Log::INFO 'bbb'
+
+Log::WARN 'ccc'
+
+Log::ERROR 'ddd'
+
+Log::FATAL 'eee'

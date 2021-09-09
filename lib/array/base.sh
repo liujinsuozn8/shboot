@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 Array::Contains() {
   # From: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
   # Usage: Array::Contains "target" "${list[@]}"

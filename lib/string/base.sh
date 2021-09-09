@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 String::Trim() {
   # from: https://github.com/dylanaraps/pure-bash-bible
   # Usage: String::Trim ' xxx '

@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 Builtin::ArrayContains() {
   # From: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
   # Usage: Builtin::ArrayContains "target" "${list[@]}"

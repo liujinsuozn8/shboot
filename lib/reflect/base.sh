@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 Reflect::isFunction(){
   # Usage: 
   #      Reflect::isFunction 'functionName'

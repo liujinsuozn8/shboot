@@ -1,3 +1,8 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+#---------------------------------------
+
 throw() {
   # from: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
   # Usage: e="Mesage" throw ['...']
