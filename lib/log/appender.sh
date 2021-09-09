@@ -73,14 +73,14 @@ Log::DoRollingLogFile(){
 # Appender: Console
 ############################################
 
-LogOutput_Console(){
-  # Usage: LogOutput_Console appenderName timestamp msg
+Log::Output_Console(){
+  # Usage: Log::Output_Console appenderName timestamp msg
   echo "$3"
 }
-export -f LogOutput_Console
+export -f Log::Output_Console
 
-LogAppenderRegistry_Console(){
-  # Usage LogAppenderRegistry_Console appenderName innerAppenderName settings
+Log::AppenderRegistry_Console(){
+  # Usage Log::AppenderRegistry_Console appenderName innerAppenderName settings
   # settings: -Target, -Threshold, -LogPattern
 
   local appenderName="$1"
@@ -129,14 +129,14 @@ LogAppenderRegistry_Console(){
     eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 }
-export -f LogAppenderRegistry_Console
+export -f Log::AppenderRegistry_Console
 
 ############################################
 # Appender: RandomAccessFile
 ############################################
 
-LogOutput_RandomAccessFile(){
-  # Usage: LogOutput_RandomAccessFile appenderName timestamp msg
+Log::Output_RandomAccessFile(){
+  # Usage: Log::Output_RandomAccessFile appenderName timestamp msg
   local timestamp="$2"
 
   eval local filePath=\${$1'_fileName'}
@@ -147,10 +147,10 @@ LogOutput_RandomAccessFile(){
 
   echo "$3" >> "$realFilePath"
 }
-export -f LogOutput_RandomAccessFile
+export -f Log::Output_RandomAccessFile
 
-LogAppenderRegistry_RandomAccessFile(){
-  # Usage LogAppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
+Log::AppenderRegistry_RandomAccessFile(){
+  # Usage Log::AppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
   # settings: -Threshold, -LogPattern, -FileName, -Append
 
   local appenderName="$1"
@@ -209,21 +209,21 @@ LogAppenderRegistry_RandomAccessFile(){
   local timestamp=$(Date::NowTimestamp)
   local realFilePath=$(populateLogFilePath "$fileName" "$timestamp")
 
-  # 1.3 init file
-  initLogFile "$innerAppenderName" "$realFilePath"
-
   # 2. save logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
   eval export ${innerAppenderName}'_logPattern'="\$logPattern"
 
-  # 3. save threshold
+  # 3. init log file
+  initLogFile "$innerAppenderName" "$realFilePath"
+
+  # 4. save threshold
   if [ -z "$threshold" ]; then
     eval export ${innerAppenderName}'_threshold'=\$Log__DefalutLevel
   else
     eval export ${innerAppenderName}'_threshold'=\$threshold
   fi
 
-  # 4. save append
+  # 5. save append
   if [ -z "$append" ]; then
     eval export ${innerAppenderName}'_append'='true'
   else
@@ -234,14 +234,14 @@ LogAppenderRegistry_RandomAccessFile(){
     File::ClearFile "$realFilePath"
   fi
 }
-export -f LogAppenderRegistry_RandomAccessFile
+export -f Log::AppenderRegistry_RandomAccessFile
 
 ############################################
 # Appender: RollingFile
 ############################################
 
-LogOutput_RollingFile(){
-  # Usage: LogOutput_RollingFile appenderName timestamp msg
+Log::Output_RollingFile(){
+  # Usage: Log::Output_RollingFile appenderName timestamp msg
   local appenderName="$1"
   local timestamp="$2"
   local msg="$3"
@@ -313,10 +313,10 @@ LogOutput_RollingFile(){
   # 6. output log
   echo "$msg" >> "$realFilePath"
 }
-export -f LogOutput_RandomAccessFile
+export -f Log::Output_RandomAccessFile
 
-LogAppenderRegistry_RollingFile(){
-  # Usage LogAppenderRegistry_RollingFile appenderName innerAppenderName settings
+Log::AppenderRegistry_RollingFile(){
+  # Usage Log::AppenderRegistry_RollingFile appenderName innerAppenderName settings
   # settings: 
   #      -Threshold, -LogPattern, -FileName, -FilePattern
   #      -PoliciesOnStartupTriggeringPolicy, -PoliciesSizeBasedTriggeringPolicy
@@ -448,9 +448,13 @@ LogAppenderRegistry_RollingFile(){
   # 1.3 check logPattern
   [ -z "$logPattern" ] && throw "LogAppender [${appenderName}]: LogPattern is empty"
 
-  # 1.4 filePattern: ${i} --> %i
+  # 1.4 filePattern
+  # 1.4.1 exist
+  [ -z "$filePattern" ] && throw "LogAppender [${appenderName}]: FilePattern is empty"
+
+  # 1.4.2 ${i} --> %i
   local filePtnDir=$(File::Dirname "$filePattern")
-  # check: ${i}' can only be used in file names
+  # 1.4.3 check: ${i}' can only be used in file names
   if String::Contains "$filePtnDir" '${i}'; then
     throw "LogAppender [${appenderName}]: In filepattern, \`%n\` can only be used in file name, not directories. filePattern=${filePattern}"
   fi

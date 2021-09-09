@@ -2,7 +2,7 @@ import log/base
 import log/registry
 import log/appender
 
-LogAppenderRegistry 'DefalutAppender' 'Console' \
+Log::AppenderRegistry 'DefalutAppender' 'Console' \
   "-LogPattern=${Log__DefalutLogPattern}" \
   -Threshold='DEBUG'
 

@@ -7,8 +7,8 @@ import reflect/base
 import file/base
 
 ################################################################
-LogAppenderRegistry(){
-  # Usage: LogAppenderRegistry appenderName type [key=value]
+Log::AppenderRegistry(){
+  # Usage: Log::AppenderRegistry appenderName type [key=value]
   local appenderName="$1"
   local type="$2"
   shift 2
@@ -27,8 +27,8 @@ LogAppenderRegistry(){
   eval export ${innerAppenderName}'_type'=\${type}
 
   # 5. init (if type is legal)
-  if Reflect::isFunction "LogAppenderRegistry_${type}"; then
-    eval LogAppenderRegistry_${type} "\${appenderName}" "\${innerAppenderName}" "\$@"
+  if Reflect::isFunction "Log::AppenderRegistry_${type}"; then
+    eval Log::AppenderRegistry_${type} "\${appenderName}" "\${innerAppenderName}" "\$@"
   else
     throw "Log Appender[$appenderName]: Can not resolve this type: ${type}"
   fi

@@ -1,6 +1,6 @@
 Array::Contains() {
   # From: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
-  # Usage: Builtin::ArrayContains "target" "${list[@]}"
+  # Usage: Array::Contains "target" "${list[@]}"
   local element
   for element in "${@:2}"
   do

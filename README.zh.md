@@ -56,24 +56,20 @@
     3. 如果 shell 的扩展名是 `.sh`，导入时可以不写。否则，**必须标注扩展名**
     4. `import` 实际上执行的是 `source` 处理
 
-# 日志
-## 日志的使用
-- 使用方式和 `log4j` 类似
-    1. 需要添加配置文件：`resource/log.propertiess`
-    2. 配置log输出器，可以配置多个
-    3. 在shell中调用 `Log::DEBUG` 等方法，就可以将日志输出到配置好的 log 输出器中
+# 启动方式
+- `bash <自定义shell文件名>.sh`
+- 必须通过 `bash` 来启动
+- 如果直接用 `./<自定义shell文件名>.sh` 来启动，则需要在shell开头添加 `#!/bin/bash`
+- 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
 
+# 日志
+## 日志基本功能
 - 日志级别，及其大小关系
     ```
     DEBUG < INFO < WARN < ERROR < FATAL
     ```
-
-- 使用方式
+- 输出日志的方法。输出前，需要自动或手动注册日志输出器
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
-
-    import log/
-
     Log::DEBUG 'test debug'
     Log::INFO 'test info'
     Log::WARN 'test warn'
@@ -81,7 +77,7 @@
     Log::FATAL 'test fatal'
     ```
 
-## 自动加载
+## 自动加载log输出器
 ### 自动加载默认的控制台log输出器
 - 使用方式
     ```sh
@@ -95,11 +91,36 @@
     Log::ERROR 'ddd'
     Log::FATAL 'eee'
     ```
-- 使用的log模版
+
+- 使用的默认log模版
     ```sh
+    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
     ```
 
-## 日志的配置方法
+- `time` 参数的格式化字符串: `yyyyMMdd-HHmmss`
+
+- 可显示的日志级别: `DEBUG`
+
+### 自动加载 log.properties
+- 使用方式和 `log4j` 类似
+    1. 需要添加配置文件：`resource/log.properties`
+    2. 配置log输出器，可以配置多个
+    3. 在shell中调用 `Log::DEBUG` 等方法，就可以将日志输出到配置好的 log 输出器中
+
+- 使用方式
+    ```sh
+    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+    import log/load/autoload
+
+    Log::DEBUG 'aaa'
+    Log::INFO 'bbb'
+    Log::WARN 'ccc'
+    Log::ERROR 'ddd'
+    Log::FATAL 'eee'
+    ```
+
+## log.properties 配置方法
 ### 默认log输出器的配置
 - 现在只提供三种
     1. `Console`，在控制台打印日志
@@ -208,6 +229,48 @@
     - 填充 `FilePattern` 之前，会在环境中先创建好这些参数，然后通过 `eval` 实现填充
 
 - 内置变量 `${i}`，**只能使用在文件上，不能使用在路径中。**如果使用在路径中，将会抛出异常并强制停止
+
+## 手动加载
+### 加载 Console
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/base
+
+Log::AppenderRegistry 'name' 'Console' \
+  -LogPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS}--${time} [${level}] Method:[${shell}--${method}] Message:${msg}' \
+  -Threshold='INFO'
+```
+
+### 加载 RandomAccessFile
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/base
+
+Log::AppenderRegistry 'name' 'RandomAccessFile' \
+  -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' \
+  -threshold='DEBUG' \
+  -fileName='/logtest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log' \
+  -append='true'
+```
+
+### 加载 RollingFile
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/base
+
+Log::AppenderRegistry 'name' 'RollingFile' \
+  -LogPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' \
+  -Threshold='DEBUG' \
+  -FileName='/logtest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log' \
+  -FilePattern='/logtest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}-${i}-${i}.log' \
+  -PoliciesOnStartupTriggeringPolicy=true \
+  -PoliciesSizeBasedTriggeringPolicy=20MB \
+  -PoliciesTimeBasedTriggeringPolicy=20m \
+  -PoliciesDailyTriggeringPolicy=true
+```
 
 # 日期处理
 ## 实现方式

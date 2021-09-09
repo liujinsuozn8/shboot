@@ -27,8 +27,8 @@ __populate_msg(){
 }
 export -f __populate_msg
 
-LogOutput(){
-  # Usage: LogOutput levelId msg shell method
+Log::Output(){
+  # Usage: Log::Output levelId msg shell method
   local levelId=$1
   if [[ ${!levelId} -lt $Log_Root_Level ]]; then
     return 0
@@ -50,36 +50,36 @@ LogOutput(){
 
     # 3. output log （to console or file）
     eval local appenderType=\${${appenderName}'_type'}
-    eval "LogOutput_${appenderType}" "\$appenderName" "\$timestamp" "\$msg"
+    eval "Log::Output_${appenderType}" "\$appenderName" "\$timestamp" "\$msg"
   done
 }
-export -f LogOutput
+export -f Log::Output
 
 ########################################
 
 Log::DEBUG() {
   # Usage: Log::DEBUG 'msg'
-  LogOutput DEBUG "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
+  Log::Output DEBUG "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::INFO() {
   # Usage: Log::INFO 'msg'
-  LogOutput INFO "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
+  Log::Output INFO "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::WARN() {
   # Usage: Log::WARN 'msg'
-  LogOutput WARN "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
+  Log::Output WARN "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::ERROR() {
   # Usage: Log::ERROR 'msg'
-  LogOutput ERROR "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
+  Log::Output ERROR "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 Log::FATAL() {
   # Usage: Log::FATAL 'msg'
-  LogOutput FATAL "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
+  Log::Output FATAL "$1" "${BASH_SOURCE[1]}" "${FUNCNAME[1]}"
 }
 
 
