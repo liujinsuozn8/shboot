@@ -34,6 +34,7 @@ Log::PopulateTime(){
   # Usage: Log::PopulateTime "timestamp" "pattern"
   local timestamp="$1"
   local pattern="$2"
+  # echo "pattern=$pattern"
 
   # 1 Extract time format string
   # 'xxx ${time:0:23}{%Y/%m/%d %H:%M:%S} xxxxx' -----> ${time}{%Y/%m/%d %H:%M:%S}
@@ -51,6 +52,20 @@ Log::PopulateTime(){
 
     # 4 get next timeConfig
     timeConfig=$(Regex::Matcher "$pattern" '.*(\$\{time\}\{[^\{\}]*\}).*' 1)
+  done
+
+
+  # 5. 'xxx ${time:0:23} xxxxx' -----> ${time}
+  timeConfig=$(Regex::Matcher "$pattern" '.*(\$\{time\}).*' 1)
+  while [ -n "$timeConfig" ]; do
+    logTimeFormat="$Log__DefalutLogTimeFormat"
+
+    # create and replace
+    local timeStr=$(Date::Format "$timestamp" "${logTimeFormat}")    
+    pattern="${pattern/$timeConfig/$timeStr}"
+
+    # get next timeConfig
+    timeConfig=$(Regex::Matcher "$pattern" '.*(\$\{time\}).*' 1)
   done
 
   echo "$pattern"
