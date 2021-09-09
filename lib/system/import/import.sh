@@ -52,9 +52,6 @@ System::SourceFile() {
     # __boot__importedFiles+=( "$libPath" )
     __boot__importedFiles="$__boot__importedFiles"${IFS}"$libPath"
     __boot__importParent=$(dirname "$libPath") System::WrapSource "$libPath" "$@"
-
-  else
-    :
   fi
 }
 export -f System::SourceFile
