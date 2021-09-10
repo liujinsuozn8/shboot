@@ -308,7 +308,7 @@ Log::AppenderRegistry 'name' 'RollingFile' \
 - `$PROJECT_ROOT`，`lib`所在的目录
 - `$PROJECT_PID`，导入 shboot 的 shell 的进程ID
 
-# 工具函数
+# 工具函数 lib/
 ## lib/array
 - `import array/base`
     - `Array::Contains "target" "${list[@]}"`
@@ -521,4 +521,13 @@ Log::AppenderRegistry 'name' 'RollingFile' \
         # 白色
         Color_Text_Default
         ```
-    
+
+# 扩展工具 ext/
+## docker
+- 需要系统中存在 `docker` 指令
+- `import docker/base`
+    - `Docker::LocalImgExist 'imgName'`
+        - 检查**本地存储**中是否存在指定镜像
+        - 参数 `repositoryName` 中可以包含 `tag`, 如`xxx:latest`
+    - `Docker::LocalImgTagExist 'imgName' 'tag'`
+        - 检查存储中是否存在指定镜像的某个 `tag` 版本
