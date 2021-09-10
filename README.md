@@ -475,3 +475,50 @@ Log::AppenderRegistry 'name' 'RollingFile' \
         - 使用正则表达式匹配，并返回**所有的**匹配结果
     - `Regex::IsInteger 'string'`
         - 检查 `string` 是不是一个整数，开头可以是正负号:`+`, `-`
+
+## lib/console
+- `import console/base`
+    - `Console::EchoWithColor 'Color_Background' 'Color_Text' 'text'`
+        - 输出文字到控制台，需要手动设置背景色 + 文字颜色
+    - `Console::EchoRed "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 红
+    - `Console::EchoGreen "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 绿
+    - `Console::EchoYellow "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 黄
+    - `Console::EchoBule "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 蓝
+    - `Console::EchoPurple "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 紫
+    - `Console::EchoLightBlue "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 浅蓝
+    - `Console::EchoWhite "text"`
+        - 输出文字到控制台，背景色: 黑，文字颜色: 白
+- `import console/color`
+    - 信息输出到控制台时，可以使用的背景色
+        ```sh
+        Color_BG_Black
+        Color_BG_Red
+        Color_BG_Green
+        Color_BG_Yellow
+        Color_BG_Bule
+        Color_BG_Purple
+        Color_BG_LightBlue
+        Color_BG_White
+        # 黑色
+        Color_BG_Default
+        ```
+    - 信息输出到控制台时，可以使用的文字颜色
+        ```sh
+        Color_Text_Black
+        Color_Text_Red
+        Color_Text_Green
+        Color_Text_Yellow
+        Color_Text_Bule
+        Color_Text_Purple
+        Color_Text_LightBlue
+        Color_Text_White
+        # 白色
+        Color_Text_Default
+        ```
+    

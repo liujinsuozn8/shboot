@@ -52,8 +52,12 @@ Log::Output(){
 
     # 3. output log （to console or file）
     eval local appenderType=\${${appenderName}'_type'}
-    eval "Log::Output_${appenderType}" "\$appenderName" "\$timestamp" "\$msg"
+
+    # concurrent execution
+    eval "Log::Output_${appenderType}" "$levelId" "\$appenderName" "\$timestamp" "\$msg" &
   done
+
+  wait
 }
 export -f Log::Output
 

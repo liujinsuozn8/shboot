@@ -42,9 +42,3 @@ Properties::GetKeyAndValue() {
 
   printf '%s\n' "${result[@]}"
 }
-
-
-# "${PROJECT_ROOT}/resource/log.properties"
-# # for x in ${file_data[@]};do
-# # 	echo "$x"
-# # done

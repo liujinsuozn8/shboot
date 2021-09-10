@@ -6,6 +6,9 @@
 import string/base
 import file/base
 import date/base
+import console/base
+import console/color
+
 #########################################################
 # common
 #########################################################
@@ -79,8 +82,24 @@ Log::DoRollingLogFile(){
 ############################################
 
 Log::Output_Console(){
-  # Usage: Log::Output_Console appenderName timestamp msg
-  echo "$3"
+  # Usage: Log::Output_Console loglevel appenderName timestamp msg
+  case $1 in
+    DEBUG)
+      echo -e "$4"
+    ;;
+    INFO)
+      Console::EchoGreen "$4"
+    ;;
+    WARN)
+      Console::EchoYellow "$4"
+    ;;
+    ERROR)
+      Console::EchoRed "$4"
+    ;;
+    FATAL)
+      Console::EchoWithColor $Color_BG_Red $Color_Text_White "$4"
+    ;;
+  esac
 }
 export -f Log::Output_Console
 
@@ -141,16 +160,16 @@ export -f Log::AppenderRegistry_Console
 ############################################
 
 Log::Output_RandomAccessFile(){
-  # Usage: Log::Output_RandomAccessFile appenderName timestamp msg
-  local timestamp="$2"
+  # Usage: Log::Output_RandomAccessFile loglevel appenderName timestamp msg
+  local timestamp="$3"
 
-  eval local filePath=\${$1'_fileName'}
+  eval local filePath=\${$2'_fileName'}
 
   local realFilePath=$(populateLogFilePath "$filePath" "$timestamp")
 
-  initLogFile "$1" "$realFilePath"
+  initLogFile "$2" "$realFilePath"
 
-  echo "$3" >> "$realFilePath"
+  echo "$4" >> "$realFilePath"
 }
 export -f Log::Output_RandomAccessFile
 
@@ -246,10 +265,10 @@ export -f Log::AppenderRegistry_RandomAccessFile
 ############################################
 
 Log::Output_RollingFile(){
-  # Usage: Log::Output_RollingFile appenderName timestamp msg
-  local appenderName="$1"
-  local timestamp="$2"
-  local msg="$3"
+  # Usage: Log::Output_RollingFile loglevel appenderName timestamp msg
+  local appenderName="$2"
+  local timestamp="$3"
+  local msg="$4"
 
   # 1. populate filepath
   eval local filePath=\${${appenderName}'_fileName'}
