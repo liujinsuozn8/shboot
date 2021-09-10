@@ -63,13 +63,17 @@
 - 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
 
 # 日志
-## 日志基本功能
+## 导入并使用日志
 - 日志级别，及其大小关系
     ```
     DEBUG < INFO < WARN < ERROR < FATAL
     ```
-- 输出日志的方法。输出前，需要自动或手动注册日志输出器
+- 导入并使用
     ```sh
+    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+    import log/log
+
     Log::DEBUG 'test debug'
     Log::INFO 'test info'
     Log::WARN 'test warn'
@@ -79,11 +83,12 @@
 
 ## 自动加载log输出器
 ### 自动加载默认的控制台log输出器
+- **如果没有添加配置文件:** `resources/log.properties`，将会自动加载默认的控制台log输出器
 - 使用方式
     ```sh
     source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
-    import log/load/default
+    import log/log
 
     Log::DEBUG 'aaa'
     Log::INFO 'bbb'
@@ -92,7 +97,7 @@
     Log::FATAL 'eee'
     ```
 
-- 使用的默认log模版
+- 默认log输出器的log模版
     ```sh
     ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
     ```
@@ -103,7 +108,7 @@
 
 ### 自动加载 log.properties
 - 使用方式和 `log4j` 类似
-    1. 需要添加配置文件：`resource/log.properties`
+    1. 需要添加配置文件：`resources/log.properties`
     2. 配置log输出器，可以配置多个
     3. 在shell中调用 `Log::DEBUG` 等方法，就可以将日志输出到配置好的 log 输出器中
 
@@ -111,7 +116,7 @@
     ```sh
     source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
-    import log/load/autoload
+    import log/log
 
     Log::DEBUG 'aaa'
     Log::INFO 'bbb'
@@ -235,36 +240,62 @@
 
 - 内置变量 `${i}`，**只能使用在文件上，不能使用在路径中。**如果使用在路径中，将会抛出异常并强制停止
 
-## 手动加载
-### 加载 Console
+## 注册与清除
+### 清除所有已注册的 Appender
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/registry
+
+Log::ClearAllAppenders
+```
+
+### 清除指定名称的 Appender
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/registry
+
+# 清除名称为 xx 的 appender
+Log::RemoveAppender 'xx'
+```
+
+### 注册 Console
 ```sh
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
 import log/base
+import log/registry
 
 Log::AppenderRegistry 'name' 'Console' \
   -LogPattern='${time}{yyyy/MM/dd HH:mm:ss.SSS}--${time} [${level}] Method:[${shell}--${method}] Message:${msg}' \
   -Threshold='INFO'
+
+Log::DEBUG 'test'
 ```
 
-### 加载 RandomAccessFile
+### 注册 RandomAccessFile
 ```sh
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
 import log/base
+import log/registry
 
 Log::AppenderRegistry 'name' 'RandomAccessFile' \
   -logPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' \
   -threshold='DEBUG' \
   -fileName='/logtest/${yyyy}/${MM}/${dd}/log-${time}{yyyy-MM-dd}.log' \
   -append='true'
+
+Log::DEBUG 'test'
 ```
 
-### 加载 RollingFile
+### 注册 RollingFile
 ```sh
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
 import log/base
+import log/registry
 
 Log::AppenderRegistry 'name' 'RollingFile' \
   -LogPattern='${time}{yyyy/MM/dd HH:mm:ss.SSSS} [${level}] Method:[${shell}--${method}] Message:${msg}' \
@@ -275,6 +306,9 @@ Log::AppenderRegistry 'name' 'RollingFile' \
   -PoliciesSizeBasedTriggeringPolicy=20MB \
   -PoliciesTimeBasedTriggeringPolicy=20m \
   -PoliciesDailyTriggeringPolicy=true
+
+Log::DEBUG 'test'
+
 ```
 
 # 日期处理
@@ -313,9 +347,32 @@ Log::AppenderRegistry 'name' 'RollingFile' \
 - `import array/base`
     - `Array::Contains "target" "${list[@]}"`
         - 检查集合 `list` 中是否包含 `target`
+        - 如果 list 是用 `IFS` 连接的字符串时的调用方法
+            ```sh
+            IFS=$'\n'
+            a='aaa'$IFS'bbb'$IFS'ccc'$IFS'ddd'
+            # $a 两边不能添加双引号，否则会被识别成一个字符串
+            Array::Contains 'aa' $a
+            ```
+    - `Array::Remove "target" "${list[@]}"`
+        - 从 `list` 中删除 `target`，并返回新的数组
+        - 数组的调用方式
+            ```sh
+            a=( aaa bbb ccc )
+            a=( $(Array::Remove 'aaa' "${a[@]}") )
+            ```
+        - `IFS` 连接的字符串的调用
+            ```sh
+            IFS=$'\n'
+            a='aaa'$IFS'bbb'$IFS'ccc'$IFS'ddd'
+            # $a 两边不能添加双引号，否则会被识别成一个字符串
+            a=$(Array::Remove 'aaa' $a)
+            ```
     - `Array::Join 'joinStr' "${array[@]}"`
         - 用 `joinStr` 连接数组的每一个元素，并返回连接结果
         - 其他调用方式: `Array::Join 'joinStr' 'aaa' 'bbb' 'ccc'`
+    - `Array::Remove "target" "${array[@]}"`
+        - 从数组中删除指定元素，**并返回新的数组**
 
 ## lib/date
 - `import date/base`

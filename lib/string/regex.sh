@@ -1,6 +1,7 @@
 
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
 #---------------------------------------
 
 Regex::Matcher() {
