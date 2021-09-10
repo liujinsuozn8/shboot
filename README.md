@@ -588,3 +588,5 @@ Log::DEBUG 'test'
         - 参数 `repositoryName` 中可以包含 `tag`, 如`xxx:latest`
     - `Docker::LocalImgTagExist 'imgName' 'tag'`
         - 检查存储中是否存在指定镜像的某个 `tag` 版本
+    - `Docker::CreateContainerSimple 'containsName' 'imgName' 'tag' 'volumeOutterPath' 'volumeInnerPath'`
+        - 创建一个镜像，需要提供镜像的 tag 和volume
