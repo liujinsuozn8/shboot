@@ -1,6 +1,7 @@
 
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
 #---------------------------------------
 
 import string/base
@@ -103,6 +104,14 @@ Log::Output_Console(){
 }
 export -f Log::Output_Console
 
+Log::RemoveAppender_Console(){
+  # Usage: Log::RemoveAppender_Console 'appenderName'
+  unset "${1}_type"
+  unset "${1}_logPattern"
+  unset "${1}_threshold"
+}
+export -f Log::RemoveAppender_Console
+
 Log::AppenderRegistry_Console(){
   # Usage Log::AppenderRegistry_Console appenderName innerAppenderName settings
   # settings: -Target, -Threshold, -LogPattern
@@ -172,6 +181,16 @@ Log::Output_RandomAccessFile(){
   echo "$4" >> "$realFilePath"
 }
 export -f Log::Output_RandomAccessFile
+
+Log::RemoveAppender_RandomAccessFile(){
+  # Usage: Log::RemoveAppender_RandomAccessFile 'appenderName'
+  unset "${1}_type"
+  unset "${1}_fileName"
+  unset "${1}_logPattern"
+  unset "${1}_threshold"
+  unset "${1}_append"
+}
+export -f Log::RemoveAppender_RandomAccessFile
 
 Log::AppenderRegistry_RandomAccessFile(){
   # Usage Log::AppenderRegistry_RandomAccessFile appenderName innerAppenderName settings
@@ -337,7 +356,23 @@ Log::Output_RollingFile(){
   # 6. output log
   echo "$msg" >> "$realFilePath"
 }
-export -f Log::Output_RandomAccessFile
+export -f Log::Output_RollingFile
+
+Log::RemoveAppender_RollingFile(){
+  # Usage: Log::RemoveAppender_RollingFile 'appenderName'
+  eval unset "${1}_type"
+  eval unset "${1}_todayZeroAMSecond"
+  eval unset "${1}_fileName"
+  eval unset "${1}_filePattern"
+  eval unset "${1}_sizeBasedTriggeringPolicy"
+  eval unset "${1}_timeBasedTriggeringPolicy"
+  eval unset "${1}_dailyTriggeringPolicy"
+  eval unset "${1}_onStartupTriggeringPolicy"
+  eval unset "${1}_logPattern"
+  eval unset "${1}_threshold"
+  eval unset "${1}_lastRollingSecond"
+}
+export -f Log::RemoveAppender_RollingFile
 
 Log::AppenderRegistry_RollingFile(){
   # Usage Log::AppenderRegistry_RollingFile appenderName innerAppenderName settings
@@ -591,3 +626,5 @@ Log::AppenderRegistry_RollingFile(){
   # 6 init realFilePath
   initLogFile "$innerAppenderName" "$realFilePath"
 }
+
+export -f Log::AppenderRegistry_RollingFile

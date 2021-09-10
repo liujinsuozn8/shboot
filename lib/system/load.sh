@@ -1,6 +1,7 @@
 
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
 #---------------------------------------
 
 export PROJECT_ROOT=$( cd ${BASH_SOURCE[0]%/*}/../.. && pwd )

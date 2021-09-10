@@ -1,6 +1,7 @@
 
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
 #---------------------------------------
 
 Array::Contains() {
@@ -17,6 +18,24 @@ Array::Contains() {
   return 1
 }
 export -f Array::Contains
+
+Array::Remove(){
+  # Usage: Array::Remove "target" "${list[@]}"
+  local target="$1"
+  shift 1
+
+  local result=()
+  local element
+  for element in "${@}"
+  do
+    if [[ "$element" != "$target" ]]; then
+      result+=( "$element" )
+    fi
+  done
+  
+  printf '%s\n' "${result[@]}"
+}
+export -f Array::Remove
 
 Array::Join(){
   # Usage: Array::Join 'joinStr' "${array[@]}"

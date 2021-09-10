@@ -4,6 +4,8 @@
 # Copyright (c) 2021 liujinsuozn8
 #
 # https://github.com/liujinsuozn8/shboot
+#
+# LICENSE: MIT License
 #----------------------------
 
 #---------------------
@@ -27,7 +29,7 @@ USAGE
 #---------------------
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
-import log/load/autoload
+import log/log
 
 Log::DEBUG 'aaa'
 

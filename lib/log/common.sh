@@ -1,6 +1,7 @@
 
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
 #---------------------------------------
 
 ################################################################
@@ -22,6 +23,7 @@ export Log__Type_Console='Console'
 export Log__Type_RandomAccessFile='RandomAccessFile'
 export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
+export Log__PropertiesPath="${PROJECT_ROOT}/resources/log.properties"
 ################################################################
 # registry appender
 # !!! Replace the array with a string that connected with IFS !!!
