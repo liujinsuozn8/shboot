@@ -260,6 +260,20 @@ import log/registry
 Log::RemoveAppender 'xx'
 ```
 
+### 执行过程中重新加载
+```sh
+source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+import log/log
+import log/load
+
+Log::INFO 'msg1'
+
+Log::ReLoadAppender
+
+Log::INFO 'msg2'
+```
+
 ### 注册 Console
 ```sh
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
