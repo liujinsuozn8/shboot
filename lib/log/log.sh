@@ -5,13 +5,6 @@
 #---------------------------------------
 
 import log/base
-import log/common
+import log/load
 
-# load appender
-if [ -f "$Log__PropertiesPath" ]; then
-  import log/load/autoload
-  Log::LoadPropertiesAppender "$Log__PropertiesPath"
-else
-  import log/load/default
-  Log::LoadDefaultAppender
-fi
+Log::ReLoadAppender

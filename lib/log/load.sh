@@ -13,6 +13,16 @@ import log/registry
 import log/appender
 
 ###########################
+
+Log::LoadDefaultAppender(){
+  # Usage: Log::LoadDefaultAppender
+  Log::AppenderRegistry 'DefalutAppender' 'Console' \
+    "-LogPattern=${Log__DefalutLogPattern}" \
+    -Threshold='DEBUG'
+}
+export -f Log::LoadDefaultAppender
+
+###########################
 # __findRootLogger(){
 #   local kvs=( "$@" )
 
@@ -125,3 +135,15 @@ Log::LoadPropertiesAppender(){
   done
 }
 export -f Log::LoadPropertiesAppender
+###########################
+
+Log::ReLoadAppender(){
+  Log::ClearAllAppenders
+  
+  # load appender
+  if [ -f "$Log__PropertiesPath" ]; then
+    Log::LoadPropertiesAppender "$Log__PropertiesPath"
+  else
+    Log::LoadDefaultAppender
+  fi
+}
