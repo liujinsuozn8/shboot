@@ -356,6 +356,10 @@ Log::DEBUG 'test'
 - `$PROJECT_ROOT`，`lib`所在的目录
 - `$PROJECT_PID`，导入 shboot 的 shell 的进程ID
 
+# CLI
+## shboot 提供的默认 CLI
+- 每次在控制台输入指令后，默认会取出输入内容首尾的
+
 # 工具函数
 ## lib/array
 - `import array/base`
