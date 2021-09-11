@@ -8,7 +8,7 @@ import console/color
 
 Console::EchoWithColor(){
   # Usage: Console::EchoWithColor 'Color_Background' 'Color_Text' 'text'
-  echo -e "\033[$1;$2m$3 \033[0m"
+  echo -e "\033[$1;$2m$3\033[0m"
 }
 export -f Console::EchoWithColor
 
