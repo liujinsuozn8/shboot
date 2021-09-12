@@ -29,6 +29,7 @@ USAGE
 #---------------------
 source "$(cd `dirname $0`; pwd)/lib/boot.sh"
 
+# log
 import log/log
 
 Log::DEBUG 'aaa'
@@ -40,3 +41,34 @@ Log::WARN 'ccc'
 Log::ERROR 'ddd'
 
 Log::FATAL 'eee'
+
+# try...catch
+test(){
+  try { 
+    # throw 'throw test1'
+    return 10
+    # ddd
+  } catch {
+    echo xxx
+    printStackTrace "$___EXCEPTION___"
+    return 3
+  }
+}
+
+test
+echo "result=$?"
+
+try { 
+  try {
+    throw 'throw test2'
+  } catch {
+    throw 'abcd'
+    # echo 1234
+  }
+} catch {
+  printStackTrace "$___EXCEPTION___"
+}
+
+
+throw 'out throw'
+echo "not print"
