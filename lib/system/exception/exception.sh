@@ -17,12 +17,12 @@ export -f printStackTrace
 
 Exception::makeExceptionMsg(){
   # Usage: Exception::makeException 'a' 'b' 'c' ....
-  local msg="Exception: $*\n"
+  local msg="Exception: $*"
   for (( i=0; i<${#BASH_SOURCE[@]}; i++));do
     if [ $i -eq 0 ]; then
-      msg="${msg}    at ${BASH_SOURCE[i]} (${FUNCNAME[i]})\n"
+      msg="${msg}\n    at ${BASH_SOURCE[i]} (${FUNCNAME[i]})"
     else
-      msg="${msg}    at ${BASH_SOURCE[i]} (${FUNCNAME[i]}:${BASH_LINENO[i - 1]})\n"
+      msg="${msg}\n    at ${BASH_SOURCE[i]} (${FUNCNAME[i]}:${BASH_LINENO[i - 1]})"
     fi
   done
 
@@ -34,14 +34,15 @@ throw() {
   # Usage: throw 'a' 'b' 'c' ....
 
   # make error
-  ___EXCEPTION___=$(Exception::makeExceptionMsg $*)
+  if [ ! -z "$___in_try_catch___" ]; then
+    # handler try...catch...
+    Exception::makeExceptionMsg $* >> "$PROJECT_ROOT/.exception"
 
-  # handler try...catch...
-  if [ "$___in_try_catch___" == '___in_try_catch___' ]; then
-    return 1
+    # echo "inner___EXCEPTION___=$___EXCEPTION___"
+    return 255
   else
     # if not in try..catch, kill caller
-    printStackTrace "$___EXCEPTION___"
+    printStackTrace "$(Exception::makeExceptionMsg $*)"
     kill -TERM "$$"
   fi
 
@@ -51,6 +52,29 @@ throw() {
 }
 export -f throw
 
-alias try="___EXCEPTION___=''; ___in_try_catch___='___in_try_catch___'; ("
-alias catch='); ___result___=$?; [ -z "$___EXCEPTION___" ] && ___EXCEPTION___=$(Exception::makeExceptionMsg "exit $___result___"); unset ___in_try_catch___; [ $___result___ -eq 0 ] && unset ___result___ ||'
+Exception::GetException(){
+  # Usage: Exception::GetException 'lastCommandExitCode'
+  if [ $1 -ne 255 ]; then
+    if [ $1 -eq 127 ]; then
+      Exception::makeExceptionMsg "exit 127; Command not find"
+    else
+      Exception::makeExceptionMsg "exit $1"
+    fi
+  else
+      cat "$PROJECT_ROOT/.exception"
+      > "$PROJECT_ROOT/.exception";
+  fi
+}
+export -f Exception::GetException
 
+alias try='
+  if [ -z "$___in_try_catch___" ]; then
+    export ___in_try_catch___=0
+    export ___EXCEPTION___=""
+    > "$PROJECT_ROOT/.exception"
+  fi
+  ((___in_try_catch___+=1))
+  set +e
+  (set -e;'
+
+alias catch='); ___result___=$?; ___EXCEPTION___=$(Exception::GetException $___result___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; set -e; [ $___result___ -eq 0 ] && unset ___result___ ||'

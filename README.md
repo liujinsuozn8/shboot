@@ -62,6 +62,78 @@
 - 如果直接用 `./<自定义shell文件名>.sh` 来启动，则需要在shell开头添加 `#!/bin/bash`
 - 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
 
+# 异常处理
+## 导入
+- 导入 `lib/boot.sh` 后就可以使用异常处理
+
+## 抛出异常
+- 通过 `throw` 函数抛出异常。执行后，会直接停止调用的该方法shell
+- 内部通过 `kill` 来停止进程，即使是 `result=$(throw '...')` 的方式调用，也可以停止，不会收到子进程的影响
+
+## 捕获异常
+- 可以捕获的异常 
+    - `throw` 方法抛出的异常
+    - `return`、`exit` 返回非 0 值
+    - 指令不存在的异常
+- 需要注意
+    - 在`try{}`内部，`return`、`exit` 如果返回了非 0 值，会立刻停止
+    - 可以在`try{}`内部，通过 `if method; then` 的方式来判断指令的结果，防止被当作异常抛出
+- 一层 `try...catch`
+    ```sh
+    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+
+    # 在函数中使用 try...catch
+    test(){
+      # 通过 try...catch...来捕获异常
+      # 可以捕获 throw 的异常
+      # 也可以捕获非 0 的返回值
+      try { 
+        echo aaa
+        # throw 'throw test'
+        exit 10
+      } catch {
+        echo xxx
+        
+        # 通过变量 ___EXCEPTION___ 可以获取到捕获的异常
+        # 可以通过printStackTrace来输出异常，如果导入了 log 会按照配置输出。否则会输出到控制台
+        # 如果不需要输出可以省略
+        printStackTrace "$___EXCEPTION___"
+        
+        # 如果 catch 中有 return，则执行结果是 return 的结果
+        # 如果 catch 中没有 return，则以最后一条指令的结果作为执行结果
+        return 3
+      }
+    }
+
+    # 执行 test 函数，内部将会捕获异常，并进行处理
+    test
+    echo "result=$?" # 将会输出 3
+    
+    # 如果没有 try...catch 将会直接终止程序的运行
+    throw 'out throw'
+    echo "not print"
+    ```
+
+- 多层 `try...catch...`
+    ```sh
+    try { 
+      try {
+        throw 'throw test2'
+      } catch {
+        # 1. 上一层的异常将会被捕获，可以通过：printStackTrace "$___EXCEPTION___" 输出 'throw test2' 的信息
+        # 2. 这里抛出新的异常
+        throw 'abcd'
+
+        # 3. 如果改成 echo 1234，后续将不会输出任何异常
+        # echo 1234
+      }
+    } catch {
+      # 3. 这里会输出第二层的 'abcd' 异常
+      printStackTrace "$___EXCEPTION___"
+    }
+    ```
+
+
 # 日志
 ## 导入并使用日志
 - 日志级别，及其大小关系
