@@ -99,15 +99,16 @@
         # 如果不需要输出可以省略
         printStackTrace "$___EXCEPTION___"
         
-        # 如果 catch 中有 return，则执行结果是 return 的结果
-        # 如果 catch 中没有 return，则以最后一条指令的结果作为执行结果
+        # 这里的 return 非 0 值后的处理方式，需要根据 `set`,`$-` 的设置来处理
+        # 如果设置了 `set -e` 将会立刻停止当前 shell
+        # 否则会继续执行
         return 3
       }
     }
 
     # 执行 test 函数，内部将会捕获异常，并进行处理
     test
-    echo "result=$?" # 将会输出 3
+    echo "result=$?" # 将会输出 3。(如果没有设置 set -e)
     
     # 如果没有 try...catch 将会直接终止程序的运行
     throw 'out throw'

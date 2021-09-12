@@ -51,6 +51,7 @@ test(){
   } catch {
     echo xxx
     printStackTrace "$___EXCEPTION___"
+    return 3
   }
 }
 

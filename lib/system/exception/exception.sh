@@ -74,7 +74,7 @@ alias try='
     > "$PROJECT_ROOT/.exception"
   fi
   ((___in_try_catch___+=1))
-  set +e
-  (set -e;'
 
-alias catch='); ___result___=$?; ___EXCEPTION___=$(Exception::GetException $___result___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; set -e; [ $___result___ -eq 0 ] && unset ___result___ ||'
+  export ___setOps___=$(echo $-); set +e; (set -e;'
+
+alias catch='); ___result___=$?; ___EXCEPTION___=$(Exception::GetException $___result___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; set -"$___setOps___"; [ $___result___ -eq 0 ] && unset ___result___ ||'
