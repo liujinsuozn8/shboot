@@ -1,8 +1,4 @@
 
-if [ "$__boot__bootstrapped" == true ]; then
-  return 0
-fi
-
 ##########################################################################
 # from: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh #
 ##########################################################################
@@ -130,4 +126,3 @@ import(){
   System::Import "$@"
 }
 export -f import
-declare -x __boot__bootstrapped=true
