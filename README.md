@@ -46,8 +46,24 @@
 
     # 导入与 lib 同级的其他目录下的 shell
     import 'ext/xxx'
-
     ```
+
+- 如果导入的目标不存在，将会抛出异常
+- 捕获 `import` 的异常
+    - 无法通过 `try...catch...` 来执行 `import`
+        - 因为 `try{...}` 内部会开启子进程，所以 `import` 对于 `try` 外部来说是无效的
+    - `import` 抛出异常的实现方式
+        ```sh
+        kill -TERM "$$"
+        ```
+    - 捕获异常的方式
+        ```sh
+        # 处理异常
+        trap 'import异常处理函数' TERM
+
+        # 或者忽略
+        trap '' TERM
+        ```
 
 - 可以导入的内容
     1. lib 包下的 shell
@@ -81,8 +97,10 @@
     - `return`、`exit` 返回非 0 值
     - 指令不存在的异常
 - 需要注意
-    - 在`try{}`内部，`return`、`exit` 如果返回了非 0 值，会立刻停止
-    - 可以在`try{}`内部，通过 `if method; then` 的方式来判断指令的结果，防止被当作异常抛出
+    - `return`、`exit`
+        - 在`try{}`内部，`return`、`exit` 如果返回了非 0 值，会立刻停止
+        - 可以在`try{}`内部，通过 `if method; then` 的方式来判断指令的结果，防止被当作异常抛出
+    - **try 内部会开启子进程，所以不应该在 try 内部执行 `import`。或者在try 外部使用内部的变量，或者在 try 内部修改外部的变量**
 - 一层 `try...catch`
     ```sh
     source "$(cd `dirname $0`; pwd)/lib/boot.sh"
@@ -435,8 +453,42 @@ Log::DEBUG 'test'
 - `$PROJECT_PID`，导入 shboot 的 shell 的进程ID
 
 # CLI
-## shboot 提供的默认 CLI
-- 每次在控制台输入指令后，默认会取出输入内容首尾的
+## 使用 shboot 提供的默认 CLI
+- 启动 CLI
+    ```sh
+    bash boot/cli.sh
+    ```
+- 启动后可以使用 `import` 来导入 `lib`，或者其他的功能
+- 导入后可以执行相关的函数
+- 通过输入 `exit` 或者 `CTRL + C` 来停止 CLI
+
+## 自定义 CLI 程序
+- 使用方法
+    ```sh
+    source "$(cd `dirname $0`; pwd)/../lib/boot.sh"
+
+    # 导入CLI启动函数
+    import cli/base
+
+    # 自定输入内容的处理函数，第一个参数需要用来接收控制台的输入内容
+    flow(){
+        # flow 'input'
+        ...
+    }
+
+    CLI::StartWithHandlerFunction 'cli的名字' flow
+    ```
+- cli 每次的显示显示内容为: `cli的名字> `，如果需要设置与当前状态相关的内容可以设置全局变量 `CLI_TITLE`
+    - 使用方式
+        ```sh
+        source "$(cd `dirname $0`; pwd)/../lib/boot.sh"
+        import cli/base
+
+        export CLI_TITLE='1234'
+        CLI::StartWithHandlerFunction 'mycli' flow
+        # 控制台将会显示 mycli(1234)>
+        ```
+    - 可以在自定义实现的全局范围中设置 `CLI_TITLE`，也可以根据输入内容，**在自定义处理函数中设置** `CLI_TITLE`
 
 # 工具函数
 ## lib/array
