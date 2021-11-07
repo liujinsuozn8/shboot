@@ -21,3 +21,24 @@ CLI::StartWithHandlerFunction(){
   done 
 }
 export -f CLI::StartWithHandlerFunction
+
+CLI::LoopAskYesOrNo(){
+  # Usage
+  #   result=`CLI::LoopAskYesOrNo 'msg'`
+  #   if CLI::LoopAskYesOrNo 'msg'; then
+  # Return
+  #   0: yes
+  #   1: no
+  result=''
+  while [[ "$result" != "y" && "$result" != "n" ]]
+  do
+    printf "$1"
+    read result
+  done
+
+  if [[ "$result" == "y" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}

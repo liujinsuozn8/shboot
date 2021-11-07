@@ -726,4 +726,49 @@ Log::DEBUG 'test'
         # 白色
         Color_Text_Default
         ```
-    
+
+## lib/number
+- `import number/base`
+    - `Number::Compare 'num1' 'num2'`
+        - 返回两个数值(整数或小数) num1、num2 的大小关系
+        - 返回值
+            ```
+            1 num1 > num2
+            0 num1 == num2
+            -1 num1 < num2
+            ```
+    - `Number::Max 'num1' 'num2'`
+        - 返回两个数值(整数或小数) num1、num2 中的最大值
+    - `Number::Eq 'num1' 'num2'`
+        - 检查 `num1 == num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+    - `Number::Ne 'num1' 'num2'`
+        - 检查 `num1 != num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+    - `Number::Gt 'num1' 'num2'`
+        - 检查 `num1 > num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+    - `Number::Lt 'num1' 'num2'`
+        - 检查 `num1 < num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+    - `Number::Ge 'num1' 'num2'`
+        - 检查 `num1 >= num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+    - `Number::Le 'num1' 'num2'`
+        - 检查 `num1 <= num2`
+        - 返回值，`true` 返回 `0`，`false` 返回 `1`
+
+## lib/cli
+- `import cli/base`
+    - `CLI::StartWithHandlerFunction 'cli的名字' flow`
+        - 启动自定义控制台程序
+    - `CLI::LoopAskYesOrNo 'msg'`
+        - 循环询问 yes 或者 no
+        - 输入 `y` 返回 `0`，输入 `n` 返回 `1`
+        - 使用方式
+            ```sh
+            result=`CLI::LoopAskYesOrNo 'msg'`
+
+            if CLI::LoopAskYesOrNo 'msg'; then
+            fi
+            ```
