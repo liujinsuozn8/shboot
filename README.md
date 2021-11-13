@@ -2,12 +2,12 @@
 
 # 参考
 - https://github.com/niieani/bash-oo-framework
-    - import 加载系统，基本上都是从这里参考的
+    - import 加载系统的来源
         - 只保留了 `import` 一个加载函数
-        - 暂时不考虑**面向对象的特性**，虽然很好用，但是我更倾向于面向过程，并提供更多的工具方法
-    - `try...catch...` 的处理方式是从这里参考的
-        - 实现上也是通过 `alias` 定义了 `try` 与 `catch` 的行为
-        - 在实现上进行了一定程度上的简化，减少了多层 `try...catch...` 嵌套时，临时保存异常时与文件的交换次数
+        - 暂时不考虑**面向对象的特性**。只提供更多的工具方法
+    - `try...catch...` 的来源
+        - 实现上是通过 `alias` 定义了 `try` 与 `catch` 的行为
+        - 在实现上进行了一定程度上的简化，减少了在多层 `try...catch...` 嵌套中，临时保存异常时与文件的交换次数
             - 因为 `try...catch...` 的实现涉及到启动子进程，并且 `alias` 不能包含 `parameter=$(` 这种父子进程交互的操作，所以多层 `try...catch...` 存储上一层的异常时，只能暂存到临时文件中
 
 - https://github.com/tomas/skull
@@ -449,8 +449,8 @@ Log::DEBUG 'test'
     |z|%Z|时区|
 
 # 内置变量
-- `$PROJECT_ROOT`，`lib`所在的目录
-- `$PROJECT_PID`，导入 shboot 的 shell 的进程ID
+- `$SHBOOT_ROOT`，`lib`所在的目录
+- `$SHBOOT_PID`，导入 shboot 的 shell 的进程ID
 
 # CLI
 ## 使用 shboot 提供的默认 CLI
@@ -606,6 +606,10 @@ Log::DEBUG 'test'
             - GB, gb
             - TB, tb
             - PB, pb
+    - `File::TryWrite 'text' 'filePath'`
+        - 将 `text` 写入文件。如果文件中已经存在 `text`，则不写入
+    - `File::TryAppendFileTo 'f1Path' 'f2Path'`
+        - 将 `f1Path` 文件中的内容写入 `f2Path`
 
 - `import file/properties`
     - `Properties::Read 'filePath'`

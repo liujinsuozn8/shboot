@@ -8,7 +8,7 @@ alias try='
   if [ -z "$___in_try_catch___" ]; then
     export ___in_try_catch___=0
     export ___EXCEPTION___=""
-    > "$PROJECT_ROOT/.exception"
+    > "$SHBOOT_ROOT/.exception"
   fi
   ((___in_try_catch___+=1))
 

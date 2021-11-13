@@ -242,3 +242,32 @@ File::SizeUnitStrToSize() {
   awk 'BEGIN{print "'$long'" * "'$base'"}'
 }
 export -f File::SizeUnitStrToSize
+
+File::TryWrite(){
+  # Usage 
+  #   File::TryWrite 'text' 'filePath'
+  if [[ ! -f "$2" || -z `grep -e "^$1$" "$2"` ]]; then
+    # if file is no exist or text not in file, write text to file
+    echo "$1" >> "$2"
+  fi
+}
+
+File::TryAppendFileTo(){
+  # Usage 
+  #   File::TryAppendFileTo 'f1Path' 'f2Path'
+  # if f1 is not exist，skip
+  if [[ ! -f "$1" ]]; then
+    return 0
+  fi
+
+  # if f2 is not exist，write f1 to f2
+  if [[ ! -f "$2" ]]; then
+    cat "$1" >> "$2"
+  fi
+
+  IFS=$'\n'
+  local line
+  for line in $(cat "$1"); do
+    File::TryWrite "$line" "$2"
+  done
+}

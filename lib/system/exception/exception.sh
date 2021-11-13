@@ -36,7 +36,7 @@ throw() {
   # make error
   if [ ! -z "$___in_try_catch___" ]; then
     # handler try...catch...
-    Exception::makeExceptionMsg $* >> "$PROJECT_ROOT/.exception"
+    Exception::makeExceptionMsg $* >> "$SHBOOT_ROOT/.exception"
 
     # echo "inner___EXCEPTION___=$___EXCEPTION___"
     return 255
@@ -61,8 +61,8 @@ Exception::GetException(){
       Exception::makeExceptionMsg "exit $1"
     fi
   else
-      cat "$PROJECT_ROOT/.exception"
-      > "$PROJECT_ROOT/.exception";
+      cat "$SHBOOT_ROOT/.exception"
+      > "$SHBOOT_ROOT/.exception";
   fi
 }
 export -f Exception::GetException
