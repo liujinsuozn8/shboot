@@ -16,6 +16,10 @@
     - 一些基础方法的实现
     - 中文版本：https://gitee.com/bingios/pure-bash-bible-zh_CN
 
+# 注意事项
+1. shboot 的很多功能无法在**子shell**中使用，只能通过 `source` 来引入。如果需要启动**子shell**，需要在子shell内部重新引入 shboot
+2. 因为 1 的原因，对 shboot 的所有改动的**第一原则**是启动要足够快
+
 # 系统中必须要包含指令
 - stat
 - awk
@@ -31,28 +35,34 @@
 3. 在自定义 shell 中引入 `shboot`
     ```sh
     # 这里将自定义 shell 保存到了 lib 的同级目录下！！！
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
     ```
 
 # import 导入其他 shell
 - 导入方式
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     # 如果 shell 的扩展名是 .sh，导入时可以不写
-    # 导入 lib 包下的shell
+    # 导入 shboot/lib 包下的shell
     import 'string/base'
     import 'string/regex.sh'
 
-    # 导入与 lib 同级的其他目录下的 shell
+    # 导入与 shboot/lib 同级的其他目录下的 shell
     import 'ext/xxx'
+
+    # 导入当前shell同级目录下的其他 shell，可以不写 .sh
+    import ./xxx/yyy
+
+    # 使用绝对路径导入，可以不写 .sh
+    import /aa/bb
     ```
 
 - 如果导入的目标不存在，将会抛出异常
 - 捕获 `import` 的异常
     - 无法通过 `try...catch...` 来执行 `import`
-        - 因为 `try{...}` 内部会开启子进程，所以 `import` 对于 `try` 外部来说是无效的
-    - `import` 抛出异常的实现方式
+        - 因为 `try{...}` 内部会开启子进程，所以 `import` 操作虽然会成功，但是导入的内容对于 `try` 外部来说是无效的
+    - `import` 方法抛出异常的实现方式
         ```sh
         kill -TERM "$$"
         ```
@@ -60,6 +70,8 @@
         ```sh
         # 处理异常
         trap 'import异常处理函数' TERM
+        
+        import 'xxx'
 
         # 或者忽略
         trap '' TERM
@@ -68,8 +80,6 @@
 - 可以导入的内容
     1. lib 包下的 shell
     2. 与 lib 包同级的其他目录下的 shell
-    3. `http://`, `https://` 开头的路径，会从网络上下载，并导入
-        - 为了提高启动速度，不推荐这样导入
 
 - 注意事项
     1. **同样的 shell 只会导入一次**
@@ -85,7 +95,7 @@
 
 # 异常处理
 ## 导入
-- 导入 `lib/boot.sh` 后就可以使用异常处理
+- 导入 `boot.sh` 后就可以使用异常处理
 
 ## 抛出异常
 - 通过 `throw` 函数抛出异常。执行后，会直接停止调用的该方法shell
@@ -103,7 +113,7 @@
     - **try 内部会开启子进程，所以不应该在 try 内部执行 `import`。或者在try 外部使用内部的变量，或者在 try 内部修改外部的变量**
 - 一层 `try...catch`
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     # 在函数中使用 try...catch
     test(){
@@ -166,7 +176,7 @@
     ```
 - 导入并使用
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     import log/log
 
@@ -182,7 +192,7 @@
 - **如果没有添加配置文件:** `resources/log.properties`，将会自动加载默认的控制台log输出器
 - 使用方式
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     import log/log
 
@@ -210,7 +220,7 @@
 
 - 使用方式
     ```sh
-    source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     import log/log
 
@@ -339,7 +349,7 @@
 ## 注册与清除
 ### 清除所有已注册的 Appender
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/registry
 
@@ -348,7 +358,7 @@ Log::ClearAllAppenders
 
 ### 清除指定名称的 Appender
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/registry
 
@@ -358,7 +368,7 @@ Log::RemoveAppender 'xx'
 
 ### 执行过程中重新加载
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/log
 import log/load
@@ -372,7 +382,7 @@ Log::INFO 'msg2'
 
 ### 注册 Console
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/base
 import log/registry
@@ -386,7 +396,7 @@ Log::DEBUG 'test'
 
 ### 注册 RandomAccessFile
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/base
 import log/registry
@@ -402,7 +412,7 @@ Log::DEBUG 'test'
 
 ### 注册 RollingFile
 ```sh
-source "$(cd `dirname $0`; pwd)/lib/boot.sh"
+source "$(cd `dirname $0`; pwd)/boot.sh"
 
 import log/base
 import log/registry
@@ -465,7 +475,7 @@ Log::DEBUG 'test'
 ## 自定义 CLI 程序
 - 使用方法
     ```sh
-    source "$(cd `dirname $0`; pwd)/../lib/boot.sh"
+    source "$(cd `dirname $0`; pwd)/../boot.sh"
 
     # 导入CLI启动函数
     import cli/base
@@ -481,7 +491,7 @@ Log::DEBUG 'test'
 - cli 每次的显示显示内容为: `cli的名字> `，如果需要设置与当前状态相关的内容可以设置全局变量 `CLI_TITLE`
     - 使用方式
         ```sh
-        source "$(cd `dirname $0`; pwd)/../lib/boot.sh"
+        source "$(cd `dirname $0`; pwd)/../boot.sh"
         import cli/base
 
         export CLI_TITLE='1234'

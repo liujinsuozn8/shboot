@@ -37,3 +37,13 @@
 # true/false
 - `0=true`
 - `1=false`
+
+# BASH_SOURCE
+- 通过一下代码可以列出 shell 间的整个调用链
+    ```sh
+    for ((i=0; i < ${#BASH_SOURCE[@]}; i++)); do
+      echo ${BASH_SOURCE[i]}
+    done
+    ```
+- `BASH_SOURCE[0]` 时当前这个 shell 的路径
+- `${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}` 最后一个是启动的 shell
