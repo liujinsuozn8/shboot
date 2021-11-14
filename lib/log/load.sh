@@ -105,7 +105,6 @@ Log::LoadPropertiesAppender(){
 
       # if curAppenderName not in rootAppenders, TO next
       if ! Array::Contains "$curAppenderName" "${rootAppenders[@]}"; then
-        echo 'continue'
         continue
       fi
 
