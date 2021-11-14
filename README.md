@@ -182,6 +182,10 @@
 - `try {...}` 的内部可以获取到外部的变量，但是外部无法获取到内部的（因为是**子进程**）
 - 可以通过关键字 `var` 在 try...catch 内外传递变量值
     ```sh
+    test(){
+        echo 'this is tetst'
+    }
+
     # 外部可以不使用 var，
     # 直接声明: a=1234
     var a=1234
@@ -195,10 +199,14 @@
       } catch {
         printStackTrace "$___EXCEPTION___"
       }
+
+      var testStr="$(test)"
     } catch {
       printStackTrace "$___EXCEPTION___"
     }
     echo $a #910
+    # 可以直接在外部访问 try...catch 内部的变量
+    echo $testStr #this is tetst
     ```
 
 # 日志
