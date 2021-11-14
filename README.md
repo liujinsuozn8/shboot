@@ -209,6 +209,21 @@
     echo $testStr #this is tetst
     ```
 
+## 通过 ___exitCode___ 在 catch 中处理不同的异常
+```sh
+try {
+    ...
+} catch {
+    if [[ $___exitCode___ -eq 1 ]]; then
+        echo 1...
+    elif [[ $___exitCode___ -eq 2 ]]; then
+        echo 2...
+    else
+        echo 3...
+    fi
+}
+```
+
 # 日志
 ## 导入并使用日志
 - 日志级别，及其大小关系
@@ -247,7 +262,7 @@
 
 - 默认log输出器的log模版
     ```sh
-    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
+    ${time} [${level}] Method:[${shell} ${method}] msg:${msg}
     ```
 
 - `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
@@ -280,7 +295,7 @@
 
 - 默认log输出器的log模版
     ```sh
-    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
+    ${time} [${level}] Method:[${shell} ${method}] msg:${msg}
     ```
 
 - `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
