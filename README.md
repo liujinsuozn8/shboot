@@ -167,6 +167,39 @@
     }
     ```
 
+## try...catch 关键字的使用
+- 关键字和 `{`，`}` 之间必须有空格，否则会产生异常
+    ```sh
+    try {
+        ...
+    } catch {
+        ...
+    }
+    ```
+
+## 通过关键字 var 在 try...catch 内外传递变量值
+- `try {...}` 内部的代码实际上会在一个**子进程**中执行
+- `try {...}` 的内部可以获取到外部的变量，但是外部无法获取到内部的（因为是**子进程**）
+- 可以通过关键字 `var` 在 try...catch 内外传递变量值
+    ```sh
+    # 外部可以不使用 var，
+    # 直接声明: a=1234
+    var a=1234
+    try {
+      echo "a1=$a" #a1=1234
+      var a=6789   #使用 var 设置变量值
+
+      try {
+        echo "a2=$a" #a2=5678
+        var a=910    #使用 var 设置变量值
+      } catch {
+        printStackTrace "$___EXCEPTION___"
+      }
+    } catch {
+      printStackTrace "$___EXCEPTION___"
+    }
+    echo $a #910
+    ```
 
 # 日志
 ## 导入并使用日志
