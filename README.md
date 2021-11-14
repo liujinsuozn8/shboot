@@ -189,12 +189,13 @@
 
 ## 自动加载log输出器
 ### 自动加载默认的控制台log输出器
-- **如果没有添加配置文件:** `resources/log.properties`，将会自动加载默认的控制台log输出器
 - 使用方式
+    - 使用默认
     ```sh
     source "$(cd `dirname $0`; pwd)/boot.sh"
 
-    import log/log
+    # 加载默认控制台log输出器
+    import log/logger/console
 
     Log::DEBUG 'aaa'
     Log::INFO 'bbb'
@@ -208,21 +209,26 @@
     ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
     ```
 
-- `time` 参数的格式化字符串: `yyyyMMdd-HHmmss`
+- `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
 
 - 可显示的日志级别: `DEBUG`
 
-### 自动加载 log.properties
+## 自动加载 log.properties 配置，并生成log输出器
 - 使用方式和 `log4j` 类似
     1. 需要添加配置文件：`resources/log.properties`
     2. 配置log输出器，可以配置多个
     3. 在shell中调用 `Log::DEBUG` 等方法，就可以将日志输出到配置好的 log 输出器中
 
+- 配置文件的搜索过程
+    1. 优先加载与 **启动 shell** 在同级目录下的 `resources/log.properties`
+    2. 如果 1 没有找到，则使用默认的配置文件 `shboot/resources/log.properties`
+    3. 如果 2 也没有找到，将会自动加载默认的控制台log输出器
+
 - 使用方式
     ```sh
     source "$(cd `dirname $0`; pwd)/boot.sh"
 
-    import log/log
+    import log/logger/auto
 
     Log::DEBUG 'aaa'
     Log::INFO 'bbb'
@@ -230,6 +236,15 @@
     Log::ERROR 'ddd'
     Log::FATAL 'eee'
     ```
+
+- 默认log输出器的log模版
+    ```sh
+    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
+    ```
+
+- `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
+
+- 可显示的日志级别: `DEBUG`
 
 ## log.properties 配置方法
 ### 默认log输出器的配置
