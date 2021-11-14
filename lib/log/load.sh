@@ -47,7 +47,7 @@ Log::LoadPropertiesAppender(){
   local kvs=( $(Properties::GetKeyAndValue "$1" ) )
   local rootLogger=''
   local i
-  
+
   # 1. findRootLogger
   for (( i=0; i<${#kvs[@]}; i++)) do
     local k=${kvs[i]}
@@ -77,6 +77,7 @@ Log::LoadPropertiesAppender(){
 
   # 3. Get appender from rootLogger and Check
   local rootAppenders=( )
+  local i
   for (( i=1; i<${#rootLogger[@]}; i++)) do
     rootAppenders+=( $(String::Trim "${rootLogger[i]}") )
   done
@@ -101,6 +102,13 @@ Log::LoadPropertiesAppender(){
       k=${k#appender.}
       # RF.Policies.OnStartupTriggeringPolicy --> RF
       curAppenderName=${k%%.*}
+
+      # if curAppenderName not in rootAppenders, TO next
+      if ! Array::Contains "$curAppenderName" "${rootAppenders[@]}"; then
+        echo 'continue'
+        continue
+      fi
+
       # RF.Policies.OnStartupTriggeringPolicy --> Policies.OnStartupTriggeringPolicy
       local parameter=${k#${curAppenderName}}
       # Policies.OnStartupTriggeringPolicy --> PoliciesOnStartupTriggeringPolicy
