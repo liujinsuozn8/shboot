@@ -5,8 +5,10 @@
 #---------------------------------------
 export SHBOOT_ROOT=$( cd ${BASH_SOURCE[0]%/*}/../.. && pwd )
 source "${SHBOOT_ROOT}/lib/system/env/env.sh"
+source "${SHBOOT_ROOT}/lib/system/var/var.sh"
 source "${SHBOOT_ROOT}/lib/system/exception/trycatch.sh"
 source "${SHBOOT_ROOT}/lib/system/exception/exception.sh"
+
 
 # Avoid importing in subshell
 if [ "$__boot__started" == true ]; then
