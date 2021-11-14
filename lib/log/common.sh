@@ -16,14 +16,14 @@ export FATAL=4
 export Log_Root_Level=$DEBUG
 
 #declare -g Log__DefalutLogTimeFormat='%Y/%m/%d %H:%M:%S'
-export Log__DefalutLogTimeFormat='yyyyMMdd-HHmmss'
+export Log__DefalutLogTimeFormat='yyyy/MM/dd HH:mm:ss'
 export Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
 
 export Log__Type_Console='Console'
 export Log__Type_RandomAccessFile='RandomAccessFile'
 export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
-export Log__PropertiesPath="${PROJECT_ROOT}/resources/log.properties"
+export Log__PropertiesPath="${SHBOOT_ROOT}/resources/log.properties"
 ################################################################
 # registry appender
 # !!! Replace the array with a string that connected with IFS !!!
@@ -39,7 +39,6 @@ Log::PopulateTime(){
   # Usage: Log::PopulateTime "timestamp" "pattern"
   local timestamp="$1"
   local pattern="$2"
-  # echo "pattern=$pattern"
 
   # 1 Extract time format string
   # 'xxx ${time:0:23}{%Y/%m/%d %H:%M:%S} xxxxx' -----> ${time}{%Y/%m/%d %H:%M:%S}

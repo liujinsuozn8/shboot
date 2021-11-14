@@ -27,7 +27,7 @@ Number::Compare(){
 Number::Max(){
   # Usage: 
   #      Number::Max 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
   if [[ $result -eq 1 || $result -eq 0 ]]; then
     echo $1
   else
@@ -38,7 +38,7 @@ Number::Max(){
 Number::Eq(){
   # Usage: 
   #      Number::Eq 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -eq 0 ]]; then
     return 0
@@ -50,7 +50,7 @@ Number::Eq(){
 Number::Ne(){
   # Usage: 
   #      Number::Ne 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -ne 0 ]]; then
     return 0
@@ -62,7 +62,7 @@ Number::Ne(){
 Number::Gt(){
   # Usage: 
   #      Number::Gt 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -eq 1 ]]; then
     return 0
@@ -74,7 +74,7 @@ Number::Gt(){
 Number::Lt(){
   # Usage: 
   #      Number::Lt 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -eq -1 ]]; then
     return 0
@@ -86,7 +86,7 @@ Number::Lt(){
 Number::Ge(){
   # Usage: 
   #      Number::Ge 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -eq 1 || $result -eq 0 ]]; then
     return 0
@@ -98,7 +98,7 @@ Number::Ge(){
 Number::Le(){
   # Usage: 
   #      Number::Le 'num1' 'num2'
-  result=`Number::Compare "$1" "$2"`
+  local result=`Number::Compare "$1" "$2"`
 
   if [[ $result -eq -1 || $result -eq 0 ]]; then
     return 0

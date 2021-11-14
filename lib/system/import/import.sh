@@ -9,10 +9,7 @@
 # lib/
 declare -x __boot__libPath="$( cd "${BASH_SOURCE[0]%/*}/../.." && pwd )"
 # lib/..
-declare -x  __boot__path="${__boot__libPath}/.."
-# /dev/fd
-declare -x  __boot__fdPath=$(dirname <(echo))
-declare -ix __boot__fdLength=$(( ${#__boot__fdPath} + 1 ))
+declare -x  __boot__path="$( cd "${__boot__libPath}/.." && pwd )"
 # declare -ag __boot__importedFiles
 # !!! Replace the array with a string that connected with IFS !!!
 export __boot__importedFiles=''
@@ -43,7 +40,7 @@ System::SourceFile() {
 
     # __boot__importedFiles+=( "$libPath" )
     __boot__importedFiles="$__boot__importedFiles"${IFS}"$libPath"
-    __boot__importParent=$(dirname "$libPath") System::WrapSource "$libPath" "$@"
+    System::WrapSource "$libPath" "$@"
   fi
 }
 export -f System::SourceFile
@@ -69,42 +66,25 @@ export -f System::SourcePath
 
 System::ImportOne() {
   local libPath="$1"
-  # The default is empty
-  local __boot__importParent="${__boot__importParent-}"
   local requestedPath="$libPath"
   shift
 
   if [[ "$requestedPath" == './'* ]]; then
-    requestedPath="${requestedPath:2}"
-  elif [[ "$requestedPath" == "$__boot__fdPath"* ]]; then
-    # starts with /dev/fd
-    requestedPath="${requestedPath:$__boot__fdLength}"
+    local p
+    local pathPrefix=''
+    for p in ${BASH_SOURCE[@]}; do
+      if [[ "$p" != *"lib/system/import/import.sh" ]];then
+        pathPrefix="${p%/*}"
+        break;
+      fi
+    done
+    requestedPath="${pathPrefix}/${requestedPath:2}"
   fi
 
-  # if source is from local, with parentPath
-  if [[ "$requestedPath" != 'http://'* && "$requestedPath" != 'https://'* ]];then
-    requestedPath="${__boot__importParent}/${requestedPath}"
-  fi
-
-  # source is from net
-  if [[ "$requestedPath" == 'http://'* || "$requestedPath" == 'https://'* ]]
-  then
-    __boot__importParent=$(dirname "$requestedPath") System__SourceHTTP "$requestedPath"
-    return
-  fi
-
-  # 1. try lib/**
-  # 2. try lib/../**
-  # 3. try with parent
-  # 4. try without parent
-
-  # {
-  #   # try relative to parent script
-  #   local localPath="$( cd "${BASH_SOURCE[1]%/*}" && pwd )"
-
-  #   localPath="${localPath}/${libPath}"
-  #   System::SourcePath "${localPath}" "$@"
-  # } || \
+  # 1. try shboot/lib/**
+  # 2. try shboot/**
+  # 3. try with ./
+  # 4. try with libPath
   System::SourcePath "${__boot__libPath}/${libPath}" "$@" || \
   System::SourcePath "${__boot__path}/${libPath}" "$@" || \
   System::SourcePath "${requestedPath}" "$@" || \

@@ -47,7 +47,7 @@ Log::LoadPropertiesAppender(){
   local kvs=( $(Properties::GetKeyAndValue "$1" ) )
   local rootLogger=''
   local i
-  
+
   # 1. findRootLogger
   for (( i=0; i<${#kvs[@]}; i++)) do
     local k=${kvs[i]}
@@ -62,7 +62,7 @@ Log::LoadPropertiesAppender(){
   done
 
   if [ -z "$rootLogger" ]; then
-    throw "Unable to load :${Log__PropertiesPath}.\nBecause 'rootLogger' could not be found in"
+    throw "Unable to load :${1}.\nBecause 'rootLogger' could not be found in"
   fi
 
   # 2. check rootLogger
@@ -72,17 +72,18 @@ Log::LoadPropertiesAppender(){
   if Log::isAvailableLevelStr "$logLevelStr"; then
     export Log_Root_Level=${!logLevelStr}
   else
-    throw "Unable to load :${Log__PropertiesPath}.\nIllegal rootLogger. LogLevel must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $logLevelStr"
+    throw "Unable to load :${1}.\nIllegal rootLogger. LogLevel must be one of [DEBUG, INFO, WARN, ERROR, FATAL]. Now is $logLevelStr"
   fi
 
   # 3. Get appender from rootLogger and Check
   local rootAppenders=( )
+  local i
   for (( i=1; i<${#rootLogger[@]}; i++)) do
     rootAppenders+=( $(String::Trim "${rootLogger[i]}") )
   done
 
   if [ ${#rootAppenders[@]} -eq 0 ]; then
-    throw "Unable to load :${Log__PropertiesPath}.\nIllegal rootLogger. Appender not set. rootLogger=$rootLogger"
+    throw "Unable to load :${1}.\nIllegal rootLogger. Appender not set. rootLogger=$rootLogger"
   fi
 
   # 4. load
@@ -101,6 +102,12 @@ Log::LoadPropertiesAppender(){
       k=${k#appender.}
       # RF.Policies.OnStartupTriggeringPolicy --> RF
       curAppenderName=${k%%.*}
+
+      # if curAppenderName not in rootAppenders, TO next
+      if ! Array::Contains "$curAppenderName" "${rootAppenders[@]}"; then
+        continue
+      fi
+
       # RF.Policies.OnStartupTriggeringPolicy --> Policies.OnStartupTriggeringPolicy
       local parameter=${k#${curAppenderName}}
       # Policies.OnStartupTriggeringPolicy --> PoliciesOnStartupTriggeringPolicy
@@ -130,7 +137,7 @@ Log::LoadPropertiesAppender(){
   local appender
   for appender in ${rootAppenders[@]}; do
     if ! Log::AppenderIsRegistered "$appender" ; then
-      throw "Unable to load :${Log__PropertiesPath}.\nIllegal rootLogger. The configuration of appender:[${appender}] does not exist"
+      throw "Unable to load :${1}.\nIllegal rootLogger. The configuration of appender:[${appender}] does not exist"
     fi
   done
 }
@@ -138,10 +145,18 @@ export -f Log::LoadPropertiesAppender
 ###########################
 
 Log::ReLoadAppender(){
+  # find custom log.properties
+  local startShellDir="${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}"
+  startShellDir="${startShellDir%/*}"
+  local customPropertiesPath="${startShellDir}/resources/log.properties"
+
+  # clear other appender
   Log::ClearAllAppenders
-  
+
   # load appender
-  if [ -f "$Log__PropertiesPath" ]; then
+  if [ -f "$customPropertiesPath" ];then
+    Log::LoadPropertiesAppender "$customPropertiesPath"
+  elif [ -f "$Log__PropertiesPath" ]; then
     Log::LoadPropertiesAppender "$Log__PropertiesPath"
   else
     Log::LoadDefaultAppender
