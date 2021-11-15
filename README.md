@@ -182,6 +182,10 @@
 - `try {...}` 的内部可以获取到外部的变量，但是外部无法获取到内部的（因为是**子进程**）
 - 可以通过关键字 `var` 在 try...catch 内外传递变量值
     ```sh
+    test(){
+        echo 'this is tetst'
+    }
+
     # 外部可以不使用 var，
     # 直接声明: a=1234
     var a=1234
@@ -195,11 +199,30 @@
       } catch {
         printStackTrace "$___EXCEPTION___"
       }
+
+      var testStr="$(test)"
     } catch {
       printStackTrace "$___EXCEPTION___"
     }
     echo $a #910
+    # 可以直接在外部访问 try...catch 内部的变量
+    echo $testStr #this is tetst
     ```
+
+## 通过 ___exitCode___ 在 catch 中处理不同的异常
+```sh
+try {
+    ...
+} catch {
+    if [[ $___exitCode___ -eq 1 ]]; then
+        echo 1...
+    elif [[ $___exitCode___ -eq 2 ]]; then
+        echo 2...
+    else
+        echo 3...
+    fi
+}
+```
 
 # 日志
 ## 导入并使用日志
@@ -239,7 +262,7 @@
 
 - 默认log输出器的log模版
     ```sh
-    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
+    ${time} [${level}] Method:[${shell} ${method}] msg:${msg}
     ```
 
 - `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
@@ -272,7 +295,7 @@
 
 - 默认log输出器的log模版
     ```sh
-    ${time} [${level}] Method:[${shell}--${method}] Message:${msg}
+    ${time} [${level}] Method:[${shell} ${method}] msg:${msg}
     ```
 
 - `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`

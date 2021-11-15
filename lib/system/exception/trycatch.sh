@@ -14,4 +14,4 @@ alias try='
 
   export ___setOps___=$(echo $-); set +e; (set -e;'
 
-alias catch='); ___result___=$?; ___EXCEPTION___=$(Exception::GetException $___result___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; __recoverVar; set -"$___setOps___"; [ $___result___ -eq 0 ] && unset ___result___ ||'
+alias catch='); ___exitCode___=$?; ___EXCEPTION___=$(Exception::GetException $___exitCode___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; __recoverVar; set -"$___setOps___"; [ $___exitCode___ -eq 0 ] && unset ___exitCode___ ||'

@@ -1,11 +1,18 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
+#---------------------------------------
+
 var(){
   if [[ "$1" == *"="* ]]; then
-    eval "$1"
+    local pname=${1%%=*}
+    local pval=${1#*=}
+    eval "$pname='$pval'"
 
     if [[ -n "$___in_try_catch___" && "$___in_try_catch___" != "0" ]]; then
       # if in try-catch, write param to file
-      local pname=${1%%=*}
-      eval "echo \"$pname=\$$pname\" >> $SHBOOT_ROOT/.var"
+      echo "$pname='$pval'" >> $SHBOOT_ROOT/.var
     fi
   fi
 }

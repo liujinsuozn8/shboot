@@ -17,7 +17,7 @@ export Log_Root_Level=$DEBUG
 
 #declare -g Log__DefalutLogTimeFormat='%Y/%m/%d %H:%M:%S'
 export Log__DefalutLogTimeFormat='yyyy/MM/dd HH:mm:ss'
-export Log__DefalutLogPattern='${time} [${level}] Method:[${shell}--${method}] Message:${msg}'
+export Log__DefalutLogPattern='${time} [${level}] Method:[${shell} ${method}] msg:${msg}'
 
 export Log__Type_Console='Console'
 export Log__Type_RandomAccessFile='RandomAccessFile'
