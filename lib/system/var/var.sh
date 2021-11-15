@@ -1,3 +1,9 @@
+
+#---------------------------------------
+# https://github.com/liujinsuozn8/shboot
+# LICENSE: MIT License
+#---------------------------------------
+
 var(){
   if [[ "$1" == *"="* ]]; then
     local pname=${1%%=*}
