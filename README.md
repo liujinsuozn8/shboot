@@ -4,7 +4,7 @@
 - https://github.com/niieani/bash-oo-framework
     - import 加载系统的来源
         - 只保留了 `import` 一个加载函数
-        - 暂时不考虑**面向对象的特性**。只提供更多的工具方法
+        - 暂时不考虑**面向对象的特性**。不提供偏向于整体性的功能，只提供更多的工具和方法
     - `try...catch...` 的来源
         - 实现上是通过 `alias` 定义了 `try` 与 `catch` 的行为
         - 在实现上进行了一定程度上的简化，减少了在多层 `try...catch...` 嵌套中，临时保存异常时与文件的交换次数
@@ -859,6 +859,75 @@ Log::DEBUG 'test'
             ```
 
 # 扩展工具 ext/
+
+## ext/linuxcore
+- `import ext/linuxcore/version`
+    - `LinuxCore::GetVersionStr`
+        - 获取当前 linux 核心的版本的字符串，如: `5.4.157-1.el7.elrepo.x86_64`
+        - 使用方法
+            ```sh
+            verStr=$(LinuxCore::GetVersionStr)
+            ```
+
+    - `LinuxCore::GetVersionNum`
+        - 参数
+            - `$1`:`subVersionCount`，小版本的数量
+                - 可以使用 0、1、2
+                - 默认值为 1
+                - 如果大于 2，将会使用2
+        - 返回值（示例）
+            - 5 (subVersionCount=0)
+            - 5.4 (subVersionCount=1)
+            - 5.4.157 (subVersionCount=2)
+        - 使用方法
+            ```sh
+            verNum=$(LinuxCore::GetVersionNum)
+            verNum=$(LinuxCore::GetVersionNum 0)
+            verNum=$(LinuxCore::GetVersionNum 1)
+            verNum=$(LinuxCore::GetVersionNum 2)
+            # 超过 2 时，将会自动使用 2
+            verNum=$(LinuxCore::GetVersionNum 3)
+            ```
+
+    - `LinuxCore::GetMaxCoreVersionStrFromGrub`
+        - 从 `/etc/grub2.cfg` 中获取当前机器内最大的 linux 核心版本的版本字符串
+        - 使用方法
+            ```sh
+            verStr=$(LinuxCore::GetMaxCoreVersionStrFromGrub)
+            echo $verStr # 如:5.4.157-1.el7.elrepo.x86_64
+            ```
+
+    - `LinuxCore::GetMaxCoreVersionNumFromGrub`
+        - 从 `/etc/grub2.cfg` 中获取当前机器内最大的 linux 核心版本的版本号
+        - 参数
+            - `$1`:`subVersionCount`，小版本的数量
+                - 可以使用 0、1、2
+                - 默认值为 1
+                - 如果大于 2，将会使用2
+        - 返回值（示例）
+            - 5 (subVersionCount=0)
+            - 5.4 (subVersionCount=1)
+            - 5.4.157 (subVersionCount=2)
+        - 使用方法
+            ```sh
+            verNum=$(LinuxCore::GetMaxCoreVersionNumFromGrub 0)
+            echo $verNum # 如:5
+            verNum=$(LinuxCore::GetMaxCoreVersionNumFromGrub 1)
+            echo $verNum # 如:5.4
+            verNum=$(LinuxCore::GetMaxCoreVersionNumFromGrub 2)
+            echo $verNum # 如:5.4.157
+            verNum=$(LinuxCore::GetMaxCoreVersionNumFromGrub)
+            echo $verNum # 如:5.4
+            ```
+    - `LinuxCore::GetMaxCoreVersionIndexFromGrub`
+        - 从 /etc/grub2.cfg 中获取当前机器内最大的 linux 核心版本的索引
+        - 返回值
+            - 索引值，从 0 开始
+        - 使用方法
+            ```sh
+            maxVerIdx=$(LinuxCore::GetMaxCoreVersionIndexFromGrub)
+            ```
+
 ## docker
 - 需要系统中存在 `docker` 指令
 - `import docker/base`
