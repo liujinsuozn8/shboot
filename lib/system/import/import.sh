@@ -26,21 +26,21 @@ System::SourceFile() {
   local libPath="$1"
   shift
 
-  [[ ! -f "$libPath" ]] && return 1
-
   libPath="$(Builtin::AbsPath "$libPath")"
 
   if [[ -f "$libPath" ]]; then
-
-    ## if already imported let's return
+    ## if already imported, return
     # if declare -f "Builtin::ArrayContains" &> /dev/null &&
     if [[ "${__boot__allowFileReloading-}" != true ]] && [[ ! -z "${__boot__importedFiles}" ]] && Builtin::ArrayContains "$libPath" ${__boot__importedFiles}; then
       return 0
     fi
 
+    # compatible bash3
     # __boot__importedFiles+=( "$libPath" )
     __boot__importedFiles="$__boot__importedFiles"${IFS}"$libPath"
     System::WrapSource "$libPath" "$@"
+  else
+    return 1
   fi
 }
 export -f System::SourceFile

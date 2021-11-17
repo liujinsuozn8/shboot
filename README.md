@@ -99,7 +99,7 @@
 
 ## 抛出异常
 - 通过 `throw` 函数抛出异常。执行后，会直接停止调用的该方法shell
-- 内部通过 `kill` 来停止进程，即使是 `result=$(throw '...')` 的方式调用，也可以停止，不会收到子进程的影响
+- 内部通过 `kill` 来停止进程，即使是 `result=$(throw '...')` 的方式调用，也可以停止，不会受到子进程的影响
 
 ## 捕获异常
 - 可以捕获的异常 
@@ -177,10 +177,10 @@
     }
     ```
 
-## 通过关键字 var 在 try...catch 内外传递变量值
+## 通过关键字 global 声明在 try...catch 内外都可以使用的变量
 - `try {...}` 内部的代码实际上会在一个**子进程**中执行
 - `try {...}` 的内部可以获取到外部的变量，但是外部无法获取到内部的（因为是**子进程**）
-- 可以通过关键字 `var` 在 try...catch 内外传递变量值
+- 可以通过关键字 global 声明在 try...catch 内外都可以使用的变量
     ```sh
     test(){
         echo 'this is tetst'
@@ -188,19 +188,19 @@
 
     # 外部可以不使用 var，
     # 直接声明: a=1234
-    var a=1234
+    global a=1234
     try {
       echo "a1=$a" #a1=1234
-      var a=6789   #使用 var 设置变量值
+      a=5678   #使用 var 设置变量值
 
       try {
         echo "a2=$a" #a2=5678
-        var a=910    #使用 var 设置变量值
+        a=910    #使用 var 设置变量值
       } catch {
         printStackTrace "$___EXCEPTION___"
       }
 
-      var testStr="$(test)"
+      global testStr="$(test)"
     } catch {
       printStackTrace "$___EXCEPTION___"
     }
