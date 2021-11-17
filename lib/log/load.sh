@@ -146,9 +146,7 @@ export -f Log::LoadPropertiesAppender
 
 Log::ReLoadAppender(){
   # find custom log.properties
-  local startShellDir="${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}"
-  startShellDir="${startShellDir%/*}"
-  local customPropertiesPath="${startShellDir}/resources/log.properties"
+  local customPropertiesPath="${START_SHEEL_DIR}/resources/log.properties"
 
   # clear other appender
   Log::ClearAllAppenders
