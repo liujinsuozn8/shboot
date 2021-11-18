@@ -89,9 +89,15 @@
 
 # 启动方式
 - `bash <自定义shell文件名>.sh`
-- 必须通过 `bash` 来启动
+- **必须通过 `bash` 来启动**
 - 如果直接用 `./<自定义shell文件名>.sh` 来启动，则需要在shell开头添加 `#!/bin/bash`
 - 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
+
+# 常量
+- `START_SHEEL_PATH`, 启动 shell 的完整路径
+- `START_SHEEL_DIR`, 启动 shell 所在的目录
+- `SHBOOT_ROOT`, shboot 的目录
+- `SHBOOT_PID`, 启动 shell 的 ID
 
 # 异常处理
 ## 导入
