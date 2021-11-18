@@ -12,7 +12,7 @@
 #   fi
 #   ((___in_try_catch___+=1))
 #   export ___setOps___=$(echo $-); set +e; (set -e; trap __saveGlobalVar EXIT INT TERM HUP QUIT ABRT;'
-alias try='[ -z "$___in_try_catch___" ] && export ___in_try_catch___=0 && __init_exception_cache; ((___in_try_catch___+=1)); export ___setOps___=$(echo $-); set +e; (set -e; trap __saveGlobalVar EXIT INT ABRT; exec 2> "$__boot_exception_cache";'
+alias try='[ -z "$___in_try_catch___" ] && export ___in_try_catch___=0 && __init_exception_cache; ((___in_try_catch___+=1)); export ___setOps___=$(echo $-); set +e; (set -e; addTrap "__saveGlobalVar" EXIT INT ABRT; exec 2> "$__boot_exception_cache";'
 
 alias catch='); ___exitCode___=$?; [ $___exitCode___ -ne 0 ] && ___EXCEPTION___=$(Exception::GetException $___exitCode___); ((___in_try_catch___-=1)); [ $___in_try_catch___ -eq 0 ] && unset ___in_try_catch___; __recoverGlobalVar; set -"$___setOps___"; [ $___exitCode___ -eq 0 ] && unset ___exitCode___ ||'
 
@@ -29,11 +29,17 @@ export -f printStackTrace
 
 Exception::makeExceptionMsg(){
   # Usage: Exception::makeException 'a' 'b' 'c' ....
-  local msg="Exception: $* \n$(cat $__boot_exception_cache)"
+  local msg="Exception: $* "
 
+  # get exception info from cache file
+  local exceptionCache=$(cat $__boot_exception_cache)
+  if [[ -n "$exceptionCache" ]]; then
+    msg="$msg\n${exceptionCache}"
+  fi
+  
   for (( i=0; i<${#BASH_SOURCE[@]}; i++));do
 
-    if [[ "${BASH_SOURCE[i]}" != *"lib/system/exception/exception.sh" ]]; then
+    if [[ "${BASH_SOURCE[i]}" != *"lib/system/keyword/exception.sh" ]]; then
       msg="${msg}\n    at ${BASH_SOURCE[i]} (${FUNCNAME[i]}:${BASH_LINENO[i - 1]})"
     fi
 

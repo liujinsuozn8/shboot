@@ -54,4 +54,4 @@ __clear_process_cache() {
 }
 export -f __clear_process_cache
 
-trap __clear_process_cache EXIT INT TERM HUP QUIT ABRT
+addTrap '__clear_process_cache' EXIT INT TERM HUP QUIT ABRT
