@@ -18,11 +18,11 @@ export SHBOOT_PID="$$"
 source "${SHBOOT_ROOT}/lib/system/builtin/path.sh"
 source "${SHBOOT_ROOT}/lib/system/builtin/array.sh"
 # Load import function to environment
-source "${SHBOOT_ROOT}/lib/system/import/import.sh"
 source "${SHBOOT_ROOT}/lib/system/builtin/method.sh"
 source "${SHBOOT_ROOT}/lib/system/env/env.sh"
 
 source "${SHBOOT_ROOT}/lib/system/cache/process.sh"
+source "${SHBOOT_ROOT}/lib/system/keyword/import.sh"
 source "${SHBOOT_ROOT}/lib/system/keyword/global.sh"
 source "${SHBOOT_ROOT}/lib/system/keyword/exception.sh"
 
