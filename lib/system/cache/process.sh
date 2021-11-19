@@ -45,12 +45,8 @@ export -f __init_exception_cache
 # clear cache
 # ====================
 __clear_process_cache() {
-  local exitVal=$?
-
   rm -f "$__boot_global_cache" "$__boot_exception_cache" || \
   exit 1
-
-  exit $exitVal
 }
 export -f __clear_process_cache
 
