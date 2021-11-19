@@ -26,16 +26,16 @@ addTrap(){
 export -f addTrap
 
 __execTrap(){
-  local exitVal=$?
+  local exitCode=$?
 
   local tlname="__boot_trap_${___in_try_catch___}_$1"
   # echo "$tlname"
   # for m in ${$tln__boot_trap_1_EXITame[@]};do
-  #   eval $m
+  #  [[ $(type -t "$m") == 'function' ]] && eval $m
   # done
-  eval for m in \${$tlname[@]}\;do eval \$m\; done
+  eval for m in \${$tlname[@]}\;do [[ \$\(type -t "\$m" \) == 'function' ]] \&\& eval \$m \; done
 
-  exit $exitVal
+  exit $exitCode
 }
 export -f __execTrap
 
