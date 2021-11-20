@@ -29,7 +29,8 @@
 # 开发过程中需要注意的问题
 - [/shboot/memo/zh](/shboot/memo/zh)
 
-# 在自定义 shell 中引入 shboot
+# 使用 shboot
+## 在自定义 shell 中引入 shboot
 1. 使用当前工程，作为启动工程。或者将 `lib` 目录拷贝到自定义目录下
 2. 在 `lib` 的同级目录下创建自定义 shell
 3. 在自定义 shell 中引入 `shboot`
@@ -38,7 +39,14 @@
     source "$(cd `dirname $0`; pwd)/boot.sh"
     ```
 
-# import 导入其他 shell
+## 启动方式
+- `bash <自定义shell文件名>.sh`
+- **必须通过 `bash` 来启动**
+- 如果直接用 `./<自定义shell文件名>.sh` 来启动，则需要在shell开头添加 `#!/bin/bash`
+- 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
+
+# 内置功能
+## import 导入其他 shell
 - 导入方式
     ```sh
     source "$(cd `dirname $0`; pwd)/boot.sh"
@@ -87,27 +95,51 @@
     3. 如果 shell 的扩展名是 `.sh`，导入时可以不写。否则，**必须标注扩展名**
     4. `import` 实际上执行的是 `source` 处理
 
-# 启动方式
-- `bash <自定义shell文件名>.sh`
-- **必须通过 `bash` 来启动**
-- 如果直接用 `./<自定义shell文件名>.sh` 来启动，则需要在shell开头添加 `#!/bin/bash`
-- 不能通过 `sh` 启动，因为有些语法 `sh` 无法识别
-
-# 常量
-- `START_SHEEL_PATH`, 启动 shell 的完整路径
-- `START_SHEEL_DIR`, 启动 shell 所在的目录
+## 内置变量
 - `SHBOOT_ROOT`, shboot 的目录
-- `SHBOOT_PID`, 启动 shell 的 ID
+- `SHBOOT_PID`, 启动 shell 的进程 ID
+- `START_SHEEL_DIR`, 启动 shell 所在的目录
+- `START_SHEEL_PATH`, 启动 shell 的路径
 
-# 异常处理
-## 导入
-- 导入 `boot.sh` 后就可以使用异常处理
+## addTrap 添加信号处理函数
+- 默认的 `trap` 指令对于**同一个信号**只有最后一次设置的操作会生效，无法设置多个
+- 可以通过 `addTrap` 将**函数名**添加到内部的列表中，在 shell 结束时按照添加的顺序执行
+- 使用方法
+    ```sh
+    # 只需要引入 shboot 本身即可，不需要引入其他组件
+    source "$(cd `dirname $0`; pwd)/boot.sh"
+    testM1(){
+      echo 'this is testM1'
+    }
+    testM2(){
+      echo "this is testM2, param1=$1"
+    }
 
-## 抛出异常
+    # 使用方法和原始的 trap 相同
+    # 第一个参数需要设置函数名
+    # 从第二个参数开始，设置信号
+    addTrap 'testM1' EXIT
+    # 如果函数不存在，将会自动忽略
+    addTrap 'other' EXIT
+    # 如果函数需要参数，可以进行添加
+    # !!!通过 $ 标注的变量，值是执行 addTrap 时的值，不会使用最终的变量值
+    x='XXX'
+    addTrap "testM2 $x" EXIT
+    # !!!通过 \$ 标注的变量，值最终的变量值
+    x='YYYY'
+    addTrap "testM2 \$x" EXIT
+
+    # this is testM1
+    # this is testM2, param1=XXX
+    # this is testM2, param1=YYYY
+    ```
+
+## 异常处理
+### 抛出异常
 - 通过 `throw` 函数抛出异常。执行后，会直接停止调用的该方法shell
 - 内部通过 `kill` 来停止进程，即使是 `result=$(throw '...')` 的方式调用，也可以停止，不会受到子进程的影响
 
-## 捕获异常
+### 捕获异常
 - 可以捕获的异常 
     - `throw` 方法抛出的异常
     - `return`、`exit` 返回非 0 值
@@ -173,7 +205,7 @@
     }
     ```
 
-## try...catch 关键字的使用
+### try...catch 关键字的使用
 - 关键字和 `{`，`}` 之间必须有空格，否则会产生异常
     ```sh
     try {
@@ -183,7 +215,7 @@
     }
     ```
 
-## 通过关键字 global 声明在 try...catch 内外都可以使用的变量
+### 通过关键字 global 声明在 try...catch 内外都可以使用的变量
 - `try {...}` 内部的代码实际上会在一个**子进程**中执行
 - `try {...}` 的内部可以获取到外部的变量，但是外部无法获取到内部的（因为是**子进程**）
 - 可以通过关键字 global 声明在 try...catch 内外都可以使用的变量
@@ -215,7 +247,7 @@
     echo $testStr #this is tetst
     ```
 
-## 通过 ___exitCode___ 在 catch 中处理不同的异常
+### 通过 ___exitCode___ 在 catch 中处理不同的异常
 ```sh
 try {
     ...
@@ -535,10 +567,6 @@ Log::DEBUG 'test'
     |a|%P|`AM`、`PM` 标记符|
     |z|%Z|时区|
 
-# 内置变量
-- `$SHBOOT_ROOT`，`lib`所在的目录
-- `$SHBOOT_PID`，导入 shboot 的 shell 的进程ID
-
 # CLI
 ## 使用 shboot 提供的默认 CLI
 - 启动 CLI
@@ -552,7 +580,7 @@ Log::DEBUG 'test'
 ## 自定义 CLI 程序
 - 使用方法
     ```sh
-    source "$(cd `dirname $0`; pwd)/../boot.sh"
+    source "$(cd `dirname $0`; pwd)/boot.sh"
 
     # 导入CLI启动函数
     import cli/base
@@ -568,7 +596,7 @@ Log::DEBUG 'test'
 - cli 每次的显示显示内容为: `cli的名字> `，如果需要设置与当前状态相关的内容可以设置全局变量 `CLI_TITLE`
     - 使用方式
         ```sh
-        source "$(cd `dirname $0`; pwd)/../boot.sh"
+        source "$(cd `dirname $0`; pwd)/boot.sh"
         import cli/base
 
         export CLI_TITLE='1234'
@@ -738,6 +766,27 @@ Log::DEBUG 'test'
     - `Reflect::isFunction 'functionName'`
         - 检查字符串是不是函数
         - 执行判断 `if Reflect::isFunction 'functionName';then`
+    - `Reflect::isCommand`
+        - 检查指定命令是否存在
+        - 返回值
+            - 0: 存在
+            - 1: 不存在
+        - 使用方法
+            ```sh
+            # 输出:is command
+            if Reflect::isCommand grep; then
+                echo 'is command'
+            else
+                echo 'is not command'
+            fi
+
+            # 输出:is not command
+            if Reflect::isCommand xxx; then
+                echo 'is command'
+            else
+                echo 'is not command'
+            fi
+            ```
 
 ## lib/string
 - `import string/base`

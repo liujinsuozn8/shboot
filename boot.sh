@@ -5,4 +5,4 @@
 #---------------------------------------
 
 # Load system
-source "$( cd ${BASH_SOURCE[0]%/*} && pwd )/lib/system/load.sh"
+source "$( cd $([[ "${BASH_SOURCE[0]}" != *"/"* ]] && echo "." || echo "${BASH_SOURCE[0]%/*}"); pwd )/lib/system/load.sh"

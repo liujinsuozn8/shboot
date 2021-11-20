@@ -16,3 +16,14 @@ Reflect::isFunction(){
   fi
 }
 export -f Reflect::isFunction
+
+Reflect::isCommand(){
+  # Usage: 
+  #      Reflect::isCommand functionName
+  #      if Reflect::isCommand functionName;then
+
+  # from:
+  # https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script/677212#677212
+  eval command -v $1 &>/dev/null && return 0 || return 1
+}
+export -f Reflect::isCommand
