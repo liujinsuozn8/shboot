@@ -91,11 +91,15 @@ File::AbsPath() {
   # Usage: File::AbsPath 'relative filename'
   # $1 : relative filename
   local file="$1"
-  if [[ "$file" == "/"* ]]
-  then
+  if [[ "$file" == "/"* ]];then
     echo "$file"
   else
-    echo "$(cd "$(Builtin::Dirname "$file")" && pwd)/$(Builtin::Basename "$file")"
+    local d=$( cd $([[ "${BASH_SOURCE[1]}" != *"/"* ]] && echo "." || echo "${BASH_SOURCE[1]%/*}"); pwd )
+    if [[ "$file" == './'* ]];then
+      echo "$d/${file:2}"
+    else
+      echo "$d/$file"
+    fi
   fi
 }
 export -f File::AbsPath

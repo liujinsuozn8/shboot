@@ -702,6 +702,10 @@ Log::DEBUG 'test'
         - 使用内置方法，获取一个路径的目录
     - `File::AbsPath 'relative filename'`
         - 获取一个文件路径的绝对路径
+        - 返回值
+            - 如果 `filename` 是一个以 `/` 开头的绝对路径，则直接返回原始值
+            - 如果 `filename` 是一个以 `./` 开头的相对路径，将会自动**去掉`./`，并在前面拼接调用位置所在的目录**
+            - 如果是其他的情况，直接在**前面拼接调用位置所在的目录**，这种情况获取的绝对路径**可能不正确**
     - `File::CanCreateFileInDir 'dir'`
         - 检查能否在指定的路径下创建文件
         - 执行判断: `if File::CanCreateFileInDir 'dir'; then`

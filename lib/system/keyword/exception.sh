@@ -29,20 +29,20 @@ export -f printStackTrace
 
 Exception::makeExceptionMsg(){
   # Usage: Exception::makeException 'a' 'b' 'c' ....
-  local msg="Exception: $* "
+  local msg="Exception: $*"
 
   # get exception info from cache file
-  local exceptionCache=$(cat $__boot_exception_cache)
-  if [[ -n "$exceptionCache" ]]; then
-    msg="$msg\n${exceptionCache}"
+  if [ -n "$__boot_exception_cache" ]; then
+    local exceptionCache=$(cat $__boot_exception_cache)
+    if [[ -n "$exceptionCache" ]]; then
+      msg="$msg\n${exceptionCache}"
+    fi
   fi
-  
-  for (( i=0; i<${#BASH_SOURCE[@]}; i++));do
 
+  for (( i=0; i<${#BASH_SOURCE[@]}; i++));do
     if [[ "${BASH_SOURCE[i]}" != *"lib/system/keyword/exception.sh" ]]; then
       msg="${msg}\n    at ${BASH_SOURCE[i]} (${FUNCNAME[i]}:${BASH_LINENO[i - 1]})"
     fi
-
   done
 
   echo "$msg"

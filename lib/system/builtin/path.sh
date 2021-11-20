@@ -40,18 +40,3 @@ Builtin::Dirname() {
   printf '%s\n' "${tmp:-/}"
 }
 export -f Builtin::Dirname
-
-Builtin::AbsPath() {
-  # from: http://stackoverflow.com/questions/3915040/bash-fish-command-to-print-absolute-path-to-a-file
-  # from: https://github.com/niieani/bash-oo-framework/lib/oo-bootstrap.sh
-  # Usage: Builtin::AbsPath 'relative filename'
-  # $1 : relative filename
-  local file="$1"
-  if [[ "$file" == "/"* ]]
-  then
-    echo "$file"
-  else
-    echo "$(cd "$(Builtin::Dirname "$file")" && pwd)/$(Builtin::Basename "$file")"
-  fi
-}
-export -f Builtin::AbsPath

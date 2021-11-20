@@ -26,8 +26,6 @@ System::SourceFile() {
   local libPath="$1"
   shift
 
-  libPath="$(Builtin::AbsPath "$libPath")"
-
   if [[ -f "$libPath" ]]; then
     ## if already imported, return
     # if declare -f "Builtin::ArrayContains" &> /dev/null &&
@@ -73,7 +71,7 @@ System::ImportOne() {
     local p
     local pathPrefix=''
     for p in ${BASH_SOURCE[@]}; do
-      if [[ "$p" != *"lib/system/import/import.sh" ]];then
+      if [[ "$p" != *"lib/system/keyword/import.sh" ]];then
         pathPrefix="${p%/*}"
         break;
       fi
