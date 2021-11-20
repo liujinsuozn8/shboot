@@ -11,6 +11,13 @@ if [ "$(uname)" == 'Darwin' ]; then
     mktemp "/tmp/$1"
   }
   export -f __createTmpFile
+
+  __createTmpFileName(){
+    # Usage:
+    #   __createTmpFile 'fileName'
+    mktemp -u "/tmp/$1"
+  }
+  export -f __createTmpFileName
 else
   __createTmpFile(){
     # Usage:
@@ -18,17 +25,28 @@ else
     mktemp -t "$1"
   }
   export -f __createTmpFile
+
+  __createTmpFileName(){
+    # Usage:
+    #   __createTmpFile 'fileName'
+    mktemp -t -u "$1"
+  }
+  export -f __createTmpFileName
 fi
 
 # ====================
 # global
 # ====================
 __init_global_cache() {
-  if [[ -z "$__boot_global_cache" ]]; then
-    export __boot_global_cache="$(__createTmpFile global_cache.$SHBOOT_PID.XXXXXXXX)"
+  if [ ! -e "$__boot_global_cache" ]; then
+    > "$__boot_global_cache"
   fi
 }
 export -f __init_global_cache
+
+# !!! create filename of global_cache when shboot init
+# !!! create real file of global_cache when `global` be used
+export __boot_global_cache=$(__createTmpFileName global_cache.$SHBOOT_PID.XXXXXXXX)
 
 # ====================
 # exception

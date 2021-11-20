@@ -11,8 +11,6 @@ test(){
     echo 'this is test'
 }
 
-# 外部可以不使用 var，
-# 直接声明: a=1234
 global a=1234
 try {
   echo "a1=$a" #a1=1234
