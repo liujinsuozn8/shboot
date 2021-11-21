@@ -13,6 +13,12 @@ testM1(){
 testM2(){
   echo "this is testM2, param1=$1"
 }
+testM3(){
+  if [ $exitCode -eq 0 ]; then
+    return
+  fi
+  echo "this is testM3"
+}
 
 addTrap 'testM1' EXIT
 addTrap 'other' EXIT
@@ -21,6 +27,17 @@ addTrap "testM2 $x" EXIT
 x='YYYY'
 addTrap "testM2 \$x" EXIT
 
+addTrap "testM3" EXIT
+
+# exit 0
 # this is testM1
 # this is testM2, param1=XXX
 # this is testM2, param1=YYYY
+
+# ------------------------
+
+exit 1
+# this is testM1
+# this is testM2, param1=XXX
+# this is testM2, param1=YYYY
+# this is testM3

@@ -104,6 +104,8 @@
 ## addTrap 添加信号处理函数
 - 默认的 `trap` 指令对于**同一个信号**只有最后一次设置的操作会生效，无法设置多个
 - 可以通过 `addTrap` 将**函数名**添加到内部的列表中，在 shell 结束时按照添加的顺序执行
+- 使用 `$exitCode` 来获得shell结束时的状态码
+    - 因为所有被添加的函数，最终会被内置的方法调用，所以 `$?` 已经无法表示原始的状态码了，只能通过内部提供的变量来获取
 - 使用方法
     ```sh
     # 只需要引入 shboot 本身即可，不需要引入其他组件
@@ -113,6 +115,13 @@
     }
     testM2(){
       echo "this is testM2, param1=$1"
+    }
+    testM3(){
+      # 如果没有异常将会退出该方法
+      if [ $exitCode -eq 0 ]; then
+        return
+      fi
+      echo "this is testM3"
     }
 
     # 使用方法和原始的 trap 相同
@@ -128,6 +137,8 @@
     # !!!通过 \$ 标注的变量，值最终的变量值
     x='YYYY'
     addTrap "testM2 \$x" EXIT
+    # 正常退出时，不会产生任何输出
+    addTrap "testM3" EXIT
 
     # this is testM1
     # this is testM2, param1=XXX
