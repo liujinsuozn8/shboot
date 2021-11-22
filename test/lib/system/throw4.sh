@@ -4,16 +4,10 @@
 # author: liujinsuozn8
 #---------------------------------------
 source $( cd $([[ "${BASH_SOURCE[0]}" != *"/"* ]] && echo "." || echo "${BASH_SOURCE[0]%/*}"); pwd )/../../../boot.sh
-test(){
-  test1
-}
-test1(){
-  exit 255
-}
 
 try {
   echo 111
-  test
+  xxx
   echo 222
 } catch {
   # echo 'catch'
