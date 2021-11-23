@@ -4,6 +4,7 @@
 # LICENSE: MIT License
 #---------------------------------------
 
+import string/base
 import string/regex
 
 File::TryTouch(){
@@ -15,7 +16,7 @@ File::TryTouch(){
   fi
 
   # 2. mkdir
-  local d="${1%/*}"
+  local d="$(File::Basename "$1")"
   mkdir -p "$d"
 
   local result=$?
@@ -25,7 +26,7 @@ File::TryTouch(){
 
   # 3. touch
   touch "$1"
-  
+
   return $?
 }
 export -f File::TryTouch

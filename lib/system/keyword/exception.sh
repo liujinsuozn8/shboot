@@ -21,7 +21,7 @@ printStackTrace(){
   if declare -f "Log::ERROR" &> /dev/null; then
     Log::ERROR "\n$1"
   else
-    echo -en "\033[0;31m$1\n\033[0m"
+    echo -e "\033[0;31m$1\033[0m"
   fi
 }
 export -f printStackTrace
