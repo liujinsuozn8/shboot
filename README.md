@@ -101,6 +101,31 @@
 - `START_SHEEL_DIR`, 启动 shell 所在的目录
 - `START_SHEEL_PATH`, 启动 shell 的路径
 
+## 默认的控制台log输出器
+- 使用方式
+    - 使用默认
+    ```sh
+    source "$(cd `dirname $0`; pwd)/boot.sh"
+    # 导入 boot.sh 时已经默认导入了控制台输出器，可以直接使用
+
+    Log::DEBUG 'aaa'
+    Log::INFO 'bbb'
+    Log::WARN 'ccc'
+    Log::ERROR 'ddd'
+    Log::FATAL 'eee'
+    ```
+
+- 默认log输出器的log模版
+    ```sh
+    ${time} [${level}] Method:[${shell} ${method}] msg:${msg}
+    ```
+
+- `time` 参数的格式化字符串: `yyyy/MM/dd HH:mm:ss`
+
+- 可显示的日志级别: `DEBUG`
+
+- 更多内容请参考: [自动加载log输出器](#自动加载log输出器)
+
 ## addTrap 添加信号处理函数
 - 默认的 `trap` 指令对于**同一个信号**只有最后一次设置的操作会生效，无法设置多个
 - 可以通过 `addTrap` 将**函数名**添加到内部的列表中，在 shell 结束时按照添加的顺序执行
@@ -322,8 +347,9 @@ try {
     ```sh
     source "$(cd `dirname $0`; pwd)/boot.sh"
 
+    # 导入 boot.sh 时已经默认导入了控制台输出器，不需要再重复执行导入，可以直接使用
     # 加载默认控制台log输出器
-    import log/logger/console
+    # import log/logger/console
 
     Log::DEBUG 'aaa'
     Log::INFO 'bbb'
@@ -341,7 +367,7 @@ try {
 
 - 可显示的日志级别: `DEBUG`
 
-## 自动加载 log.properties 配置，并生成log输出器
+### 自动加载 log.properties 配置，并生成log输出器
 - 使用方式和 `log4j` 类似
     1. 需要添加配置文件：`resources/log.properties`
     2. 配置log输出器，可以配置多个

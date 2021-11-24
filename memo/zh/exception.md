@@ -35,7 +35,7 @@
       # 3.3 处理 `global` 关键字，将数据写入 global 的缓存文件中
       addTrap "__saveGlobalVar" EXIT INT ABRT
       # 3.4 收集执行过程中的异常到异常缓存中
-      exec 2> "$__boot_exception_cache"
+      # exec 2> "$__boot_exception_cache"
     #---------------------------------------------------------
 
     # 4. 这里接实际 shell 中的 try{...} 内的内容
