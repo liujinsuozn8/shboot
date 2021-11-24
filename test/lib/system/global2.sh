@@ -2,7 +2,6 @@
 #---------------------------------------
 # https://github.com/liujinsuozn8/shboot
 # LICENSE: MIT License
-# author: liujinsuozn8
 #---------------------------------------
 
 # use global in try...catch
