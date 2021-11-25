@@ -331,8 +331,6 @@ try {
     ```sh
     source "$(cd `dirname $0`; pwd)/boot.sh"
 
-    import log/log
-
     Log::DEBUG 'test debug'
     Log::INFO 'test info'
     Log::WARN 'test warn'
@@ -852,38 +850,33 @@ Log::DEBUG 'test'
         - 将 `f1Path` 文件中的内容写入 `f2Path`
 
 - `import file/properties`
-    - `Properties::Read 'filePath'`
-        - 读取 `*.properties` 文件，返回一个数组
-        - 返回内中，只返回非空行，非 `#` 开头的行
-        - 返回之后会变成一个字符串，需要在调用的位置重新转换成数组
-            ```sh
-            local a=( $(Properties::Read 'xxx/yyy.properties') )
-            ```
-        - 返回结果也可以不做转换，直接进行迭代
-            ```sh
-            local a=$(Properties::Read 'xxx/yyy.properties')
-
-            local b
-            for b in ${a[@]}; do
-              echo "$b"
-            done
-            ```
     - `Properties::GetKeyAndValue 'filePath'`
         - 读取 properties 文件，并按顺序返回文件中的 key + value
-            - 如果没有设置 value，将会抛出异常
-            - **方法内部抛出的异常将会终止整个shell 的运行，所以应该在 shell 的启动阶段执行，不应该在持续执行的阶段执行**
-        - 返回的数组中，每两个为一组，第一个是 key，第二个是 value
-            - 使用时，可以配合 `shift 2` 来使用
-            - 结果示例
-                ```sh
-                # properties 文件示例
-                a=aaa
-                b=bbb
-                ```
-                ```sh
-                # 解析结果
-                result=( 'a' 'aaa' 'b' 'bbb')
-                ```
+            - 将会自动跳过 没有 key、没有 value、注释行
+        - 返回值
+            - 数组字符串。如果需要使用数组，必须手动转换
+        - 退出的状态码
+            - 1, 如果 `filePath` 文件不存在，则返回 1
+            - 0, 读取完成
+        - 示例
+            ```sh
+            # 以数组方式使用
+            # 返回的数组中，每两个为一组，第一个是 key，第二个是 value
+            kvs=( $(Properties::GetKeyAndValue "$1" ) )
+            for (( i=0; i<${#kvs[@]}; i++)) do
+                local k=${kvs[i]}
+                local v=${kvs[i+1]}
+
+                ((i=i+1))
+            done
+            ```
+            ```sh
+            # 以字符串的方式使用
+            kvs=$(test)
+            for x in ${kvs}; do
+                echo "x=$x"
+            done
+            ```
 
 ## lib/net
 - `import net/base`

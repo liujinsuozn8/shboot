@@ -16,7 +16,7 @@ File::TryTouch(){
   fi
 
   # 2. mkdir
-  local d="$(File::Basename "$1")"
+  local d="$(File::Dirname "$1")"
   mkdir -p "$d"
 
   local result=$?

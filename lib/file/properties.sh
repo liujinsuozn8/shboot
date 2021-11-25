@@ -5,40 +5,27 @@
 #---------------------------------------
 
 import string/base
-import string/regex
 
-Properties::Read() {
-  # Usage: Properties::Read 'filePath'
-  local result=( )
-  local line
-  while read -r line || [[ -n ${line} ]]; do
-    line=$(String::Trim "$line")
-    
-    if [ ! -z "$line" ] && ! String::StartsWith "$line" '#'; then
-      result+=( "$line" )
-    fi
-
-  done < "$1"
-
-  printf '%s\n' "${result[@]}"
-}
-
-Properties::GetKeyAndValue() {
+Properties::GetKeyAndValue(){
   # Usage: Properties::GetKeyAndValue 'filePath'
+  if [[ -z "$1" ]] || [[ ! -e "$1" ]]; then
+    return 1
+  fi
   local result=( )
-  local line
-  while read -r line || [[ -n ${line} ]]; do
-    line=$(String::Trim "$line")
-    
-    if [ ! -z "$line" ] && ! String::StartsWith "$line" '#'; then
-      local matcher=( $(Regex::Matcher "$line" '([^= ]+)[[:space:]]*=[[:space:]]*(.*)') )
-      if [ ${#matcher[@]} -ne 3 ];then
-        throw "Illegal text. Can not resolve this text. Maybe value is not set. text: ${line}"
-      fi
+  local k
+  local v
 
-      result+=( "${matcher[1]}" "${matcher[2]}" )
+  local IFS=' = '
+  while read k v; do
+    # skip:
+    # k is empty
+    # k StartsWith #
+    # v is empty
+    if [[ -z "$k" ]] || String::StartsWith "$k" '#' || [[ -z "$v" ]]; then
+      continue
     fi
-
+    
+    result+=( "$k" "$v" )
   done < "$1"
 
   printf '%s\n' "${result[@]}"
