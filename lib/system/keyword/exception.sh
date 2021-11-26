@@ -10,7 +10,9 @@ alias catch='); ___exitCode___=$?; [ $___exitCode___ -ne 0 ] && ___EXCEPTION___=
 
 printStackTrace(){
   # Usage: printStackTrace "$___EXCEPTION___"
-  if declare -f "Log::ERROR" &> /dev/null; then
+
+  #if declare -f "Log::ERROR" &> /dev/null; then
+  if [ "$Log__Usable" == 'true' ] && declare -f "Log::ERROR" &> /dev/null; then
     Log::ERROR "\n$1"
   else
     echo -e "\033[0;31m$1\033[0m"

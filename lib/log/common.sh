@@ -24,6 +24,8 @@ export Log__Type_RandomAccessFile='RandomAccessFile'
 export Log__Type_DailyRollingFileAppender='DailyRollingFileAppender'
 
 export Log__PropertiesPath="${SHBOOT_ROOT}/resources/log.properties"
+
+export Log__Usable=false
 ################################################################
 # registry appender
 # !!! Replace the array with a string that connected with IFS !!!
@@ -51,7 +53,7 @@ Log::PopulateTime(){
     fi
 
     # 3 create and replace
-    local timeStr=$(Date::Format "$timestamp" "${logTimeFormat}")    
+    local timeStr=$(Date::Format "$timestamp" "${logTimeFormat}")
     pattern="${pattern/$timeConfig/$timeStr}"
 
     # 4 get next timeConfig
@@ -65,7 +67,7 @@ Log::PopulateTime(){
     logTimeFormat="$Log__DefalutLogTimeFormat"
 
     # create and replace
-    local timeStr=$(Date::Format "$timestamp" "${logTimeFormat}")    
+    local timeStr=$(Date::Format "$timestamp" "${logTimeFormat}")
     pattern="${pattern/$timeConfig/$timeStr}"
 
     # get next timeConfig

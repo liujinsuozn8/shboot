@@ -14,6 +14,8 @@ import file/base
 
 ################################################################
 Log::AppenderRegistry(){
+  export Log__Usable=false
+
   # Usage: Log::AppenderRegistry appenderName type [key=value]
   local appenderName="$1"
   local type="$2"
@@ -38,10 +40,14 @@ Log::AppenderRegistry(){
   else
     throw "Log Appender[$appenderName]: Can not resolve this type: ${type}"
   fi
+
+  export Log__Usable=true
 }
 export -f Log::AppenderRegistry
 
 Log::RemoveAppender(){
+  export Log__Usable=false
+
   # Usage: Log::RemoveAppender 'appenderName'
   local appenderName="$1"
 
@@ -61,11 +67,17 @@ Log::RemoveAppender(){
     # remove appender
     export Log_Global_Appenders=$(Array::Remove "$appenderName" ${Log_Global_Appenders})
   fi
+
+  if  [ -n "$Log_Global_Appenders" ]; then
+    export Log__Usable=true
+  fi
 }
 export -f Log::RemoveAppender
 
 Log::ClearAllAppenders(){
   # Usage: Log::ClearAllAppenders
+  export Log__Usable=false
+
 
   local appenderName
   for appenderName in ${Log_Global_Appenders[@]}; do
