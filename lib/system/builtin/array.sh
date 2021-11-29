@@ -19,3 +19,21 @@ Builtin::ArrayContains() {
 }
 
 export -f Builtin::ArrayContains
+
+Builtin::ArrayRemove(){
+  # Usage: Builtin::ArrayRemove "target" "${list[@]}"
+  local target="$1"
+  shift 1
+
+  local result=()
+  local element
+
+  for element in $@;do
+    if [[ "$element" != "$target" ]]; then
+      result+=( "$element" )
+    fi
+  done
+  
+  printf '%s\n' "${result[@]}"
+}
+export -f Builtin::ArrayRemove

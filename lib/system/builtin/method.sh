@@ -20,7 +20,24 @@ addTrap(){
     # fi
     # __boot_trap_1_EXIT=($target)
     # eval [ -z "\$$tlname" ] \&\& $tlname\=\(\) \&\& trap \'__execTrap $e\' $e \; $tlname+=\($target\)
-    eval "[ -z \"\$$tlname\" ] && $tlname='' && trap '__execTrap $e' $e; $tlname=\"\${$tlname}${IFS}\${target}\""
+    eval "[ -z \"\$$tlname\" ] && export $tlname='' && trap '__execTrap $e' $e; $tlname=\"\${$tlname}${IFS}\${target}\""
+  done
+}
+export -f addTrap
+
+delTrap(){
+  local target="$1"
+  shift 1
+
+  local e
+  for e in $@; do
+    # use var from [shboot/lib/system/keyword/exception.sh]
+    local tlname="__boot_trap_${___in_try_catch___}_$e"
+    # if [ -z "$__boot_trap_1_EXIT" ]; then
+    #   __boot_trap_1_EXIT=$(Builtin::ArrayRemove "$target" "${__boot_trap_1_EXIT[@]}"
+    # fi
+
+    eval "[ -n \"\$$tlname\" ] && $tlname=\$(Builtin\:\:ArrayRemove \"\$target\" \"\${$tlname[@]}\")"
   done
 }
 export -f addTrap
@@ -33,6 +50,7 @@ __execTrap(){
   # for m in ${__boot_trap_1_EXIT[@]};do
   # or
   # for m in ${__boot_trap__EXIT[@]};do
+  #   echo "__execTrap=$m"
   #  [[ $(type -t "${m% *}") == 'function' ]] && eval $m
   # done
 

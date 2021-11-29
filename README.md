@@ -126,10 +126,11 @@
 
 - 更多内容请参考: [自动加载log输出器](#自动加载log输出器)
 
-## addTrap 添加信号处理函数
+## 信号处理
+### addTrap 添加信号处理函数及其参数
 - 默认的 `trap` 指令对于**同一个信号**只有最后一次设置的操作会生效，无法设置多个
 - 可以通过 `addTrap` 将**函数名**添加到内部的列表中，在 shell 结束时按照添加的顺序执行
-- 使用 `$exitCode` 来获得shell结束时的状态码
+- 在信号函数内部使用 `$exitCode` 来获得shell结束时的状态码
     - 因为所有被添加的函数，最终会被内置的方法调用，所以 `$?` 已经无法表示原始的状态码了，只能通过内部提供的变量来获取
 - 使用方法
     ```sh
@@ -168,6 +169,48 @@
     # this is testM1
     # this is testM2, param1=XXX
     # this is testM2, param1=YYYY
+    ```
+
+### delTrap 删除信号处理函数及其参数
+- 使用方法
+    ```sh
+    # 只需要引入 shboot 本身即可，不需要引入其他组件
+    source "$(cd `dirname $0`; pwd)/boot.sh"
+    testM1(){
+      echo 'this is testM1'
+    }
+
+    testM2(){
+      echo "this is testM2, param1=$1"
+    }
+
+    testM3(){
+      echo "this is testM3"
+    }
+
+    # 1. 添加信号函数
+    addTrap 'testM1' EXIT
+
+    # !!!通过 $ 标注的变量，值是执行 addTrap 时的值，不会使用最终的变量值
+    x='XXX'
+    addTrap "testM2 $x" EXIT
+
+    # !!!通过 \$ 标注的变量，值最终的变量值
+    x='YYYY'
+    addTrap "testM2 \$x" EXIT
+
+    addTrap 'testM3' EXIT
+
+    # 2. 删除信号函数
+    # 删除无参数的信号函数
+    delTrap 'testM1' EXIT
+    # 删除有参函数。因为变量 x 已经发生了变化，所以无法删除!!!
+    delTrap "testM2 $x" EXIT
+    # 删除有参函数。通过 \$ 让然保持了变量名，所以可以删除
+    delTrap "testM2 \$x" EXIT
+
+    # this is testM2, param1=XXX
+    # this is testM3
     ```
 
 ## 异常处理
@@ -686,8 +729,8 @@ Log::DEBUG 'test'
             ```sh
             IFS=$'\n'
             a='aaa'$IFS'bbb'$IFS'ccc'$IFS'ddd'
-            # $a 两边不能添加双引号，否则会被识别成一个字符串
             a=$(Array::Remove 'aaa' $a)
+            a=$(Array::Remove 'ccc' "$a")
             ```
     - `Array::Join 'joinStr' "${array[@]}"`
         - 用 `joinStr` 连接数组的每一个元素，并返回连接结果
@@ -881,6 +924,7 @@ Log::DEBUG 'test'
 ## lib/net
 - `import net/base`
     - `Net::SimpleDownload 'url' 'localPath' 'retryCount'`
+        - 下载 `url` 指定的内容
         - 参数
             - `$1:url`，下载内容的地址
             - `$2:localPath`，下载到本地后保存的**文件地址**，需要包含文件名
@@ -894,7 +938,6 @@ Log::DEBUG 'test'
             - 如果执行下载失败，会将 `localPath` 路径的文件删除
         - 示例
             ```sh
-            ```
             Net::SimpleDownload https://github.com/git/git/archive/refs/tags/v2.34.0.zip "./git.zip" 5
             case $? in
               0) echo success;;
@@ -902,8 +945,80 @@ Log::DEBUG 'test'
               *) echo other;;
             esac
             ```
-
-
+    - `Net::SimpleDownloadWithHandleINT 'url' 'localPath' 'retryCount'`
+        - 下载 `url` 指定的内容
+            - 下载前，会设置 `ctrl + c` 信号处理函数
+            - 如果下载过程被 `ctrl + c` 中断，会通过信号函数**删除**下载的中间文件
+            - 如果下载完成，或者下载异常，将会删除信号函数
+        - 参数
+            - `$1:url`，下载内容的地址
+            - `$2:localPath`，下载到本地后保存的**文件地址**，需要包含文件名
+            - `$3:retryCount`，**可选**。下载失败时的重试次数，如果没有设置该参数，默认不会重试
+        - 返回值
+            - 0, 下载成功
+            - 1, 下载失败
+            - 2, 下载指令不存在(curl 或者 wget)
+        - 注意事项
+            - 如果 `localPath` 路径的文件已经存在，将会被覆盖
+            - 如果执行下载失败，会将 `localPath` 路径的文件删除
+        - 示例
+            ```sh
+            Net::SimpleDownloadWithHandleINT https://github.com/git/git/archive/refs/tags/v2.34.0.zip "./git.zip" 5
+            case $? in
+              0) echo success;;
+              2) echo no command;;
+              *) echo other;;
+            esac
+            ```
+    - `Net::TrySimpleDownload 'url' 'localPath' 'retryCount'`
+        - 下载 `url` 指定的内容
+            - **如果 `localPath` 已经存在，则不执行下载**
+        - 参数
+            - `$1:url`，下载内容的地址
+            - `$2:localPath`，下载到本地后保存的**文件地址**，需要包含文件名
+            - `$3:retryCount`，**可选**。下载失败时的重试次数，如果没有设置该参数，默认不会重试
+        - 返回值
+            - 0, 下载成功
+            - 1, 下载失败
+            - 2, 下载指令不存在(curl 或者 wget)
+        - 注意事项
+            - 如果 `localPath` 已经存在，则不执行下载
+            - 如果执行下载失败，会将 `localPath` 路径的文件删除
+        - 示例
+            ```sh
+            Net::TrySimpleDownload https://github.com/git/git/archive/refs/tags/v2.34.0.zip "./git.zip" 5
+            case $? in
+              0) echo success;;
+              2) echo no command;;
+              *) echo other;;
+            esac
+            ```
+    - `Net::TrySimpleDownloadWithHandleINT 'url' 'localPath' 'retryCount'`
+        - 下载 `url` 指定的内容
+            - **如果 `localPath` 已经存在，则不执行下载**
+            - 下载前，会设置 `ctrl + c` 信号处理函数
+            - 如果下载过程被 `ctrl + c` 中断，会通过信号函数**删除**下载的中间文件
+            - 如果下载完成，或者下载异常，将会删除信号函数
+        - 参数
+            - `$1:url`，下载内容的地址
+            - `$2:localPath`，下载到本地后保存的**文件地址**，需要包含文件名
+            - `$3:retryCount`，**可选**。下载失败时的重试次数，如果没有设置该参数，默认不会重试
+        - 返回值
+            - 0, 下载成功
+            - 1, 下载失败
+            - 2, 下载指令不存在(curl 或者 wget)
+        - 注意事项
+            - 如果 `localPath` 已经存在，则不执行下载
+            - 如果执行下载失败，会将 `localPath` 路径的文件删除
+        - 示例
+            ```sh
+            Net::TrySimpleDownload https://github.com/git/git/archive/refs/tags/v2.34.0.zip "./git.zip" 5
+            case $? in
+              0) echo success;;
+              2) echo no command;;
+              *) echo other;;
+            esac
+            ```
 ## lib/number
 - `import number/base`
     - `Number::Compare 'num1' 'num2'`

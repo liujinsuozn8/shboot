@@ -26,8 +26,7 @@ Array::Remove(){
 
   local result=()
   local element
-  for element in "${@}"
-  do
+  for element in $@;do
     if [[ "$element" != "$target" ]]; then
       result+=( "$element" )
     fi
