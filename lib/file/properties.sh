@@ -6,8 +6,32 @@
 
 import string/base
 
-Properties::GetKeyAndValue(){
-  # Usage: Properties::GetKeyAndValue 'filePath'
+Properties::GetValue(){
+  # Usage: Properties::GetAllKeyAndValue 'filePath' 'key'
+  if [[ -z "$1" ]] || [[ ! -e "$1" ]] || [[ -z "$2" ]]; then
+    return 1
+  fi
+
+  local k
+  local v
+  local IFS=' = '
+  local result=''
+  while read k v; do
+    if [[ -z "$k" ]] || String::StartsWith "$k" '#' || [[ -z "$v" ]]; then
+      continue
+    fi
+
+    if [[ "$k" == "$2" ]]; then
+      result="$v"
+      break
+    fi
+  done < "$1"
+
+  echo "$result"
+}
+
+Properties::GetAllKeyAndValue(){
+  # Usage: Properties::GetAllKeyAndValue 'filePath'
   if [[ -z "$1" ]] || [[ ! -e "$1" ]]; then
     return 1
   fi

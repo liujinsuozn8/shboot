@@ -893,7 +893,7 @@ Log::DEBUG 'test'
         - 将 `f1Path` 文件中的内容写入 `f2Path`
 
 - `import file/properties`
-    - `Properties::GetKeyAndValue 'filePath'`
+    - `Properties::GetAllKeyAndValue 'filePath'`
         - 读取 properties 文件，并按顺序返回文件中的 key + value
             - 将会自动跳过 没有 key、没有 value、注释行
         - 返回值
@@ -905,7 +905,7 @@ Log::DEBUG 'test'
             ```sh
             # 以数组方式使用
             # 返回的数组中，每两个为一组，第一个是 key，第二个是 value
-            kvs=( $(Properties::GetKeyAndValue "$1" ) )
+            kvs=( $(Properties::GetAllKeyAndValue "$1" ) )
             for (( i=0; i<${#kvs[@]}; i++)) do
                 local k=${kvs[i]}
                 local v=${kvs[i+1]}
@@ -919,6 +919,27 @@ Log::DEBUG 'test'
             for x in ${kvs}; do
                 echo "x=$x"
             done
+            ```
+    - `Properties::GetValue 'filePath' 'key'`
+        - 读取 properties 文件，根据 key 查找 value。
+            - 如果没有指定的 key，将会返回空字符串
+            - 将会自动跳过 没有 key、没有 value、注释行
+        - 返回值
+            - value 的字符串
+        - 状态码
+            - 1, 如果 `filePath` 文件不存在，则返回 1
+            - 0, 读取完成
+        - 示例
+            ```sh
+            # 1. 能够搜索到，返回字符串
+            v=$(Properties::GetValue './resources/log.properties' 'appender.RF')
+            echo $v
+            # RollingFile
+
+            # 2. 不能搜索到，返回空字符
+            v=$(Properties::GetValue './resources/log.properties' 'xxxxxx')
+            echo $v
+            # 显示空
             ```
 
 ## lib/net

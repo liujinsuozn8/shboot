@@ -44,7 +44,7 @@ Log::LoadPropertiesAppender(){
   # Usage: Log::LoadPropertiesAppender 'propertiesPath'
   export Log_Global_Appenders=''
 
-  local kvs=( $(Properties::GetKeyAndValue "$1" ) )
+  local kvs=( $(Properties::GetAllKeyAndValue "$1" ) )
   local rootLogger=''
   local i
 
