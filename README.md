@@ -1071,6 +1071,22 @@ Log::DEBUG 'test'
         - 检查 `num1 <= num2`
         - 返回值，`true` 返回 `0`，`false` 返回 `1`
 
+## lib/random
+- `import random/base`
+    - `Random::NumAndEnStr strLength`
+        - 功能
+            - 生成指定长度的随机字符串。包括: 数字、大小写英文字母
+        - 参数
+            - `$1 : strLength`, 随机字符串的长度
+        - 返回值
+            - 随机字符串
+        - 状态码
+            - 1, 参数数量不正确，或者第一个参数不是证书
+        - 使用方法
+            ```sh
+            randomStr=$(Random::NumAndEnStr 10)
+            ```
+
 ## lib/reflect
 - `import reflect/base`
     - `Reflect::isFunction 'functionName'`
@@ -1128,8 +1144,36 @@ Log::DEBUG 'test'
         - 使用正则表达式匹配，并返回第 `num` 个匹配结果
     - `Regex::Matcher "source" "pattern"`
         - 使用正则表达式匹配，并返回**所有的**匹配结果
-    - `Regex::IsInteger 'string'`
-        - 检查 `string` 是不是一个整数，开头可以是正负号:`+`, `-`
+    - `Regex::IsInteger 'num'`
+        - 检查 `num` 是不是一个整数，开头可以是正负号:`+`, `-`
+    - `Regex::IsUnsignedInt 'num'`
+        - 检查 `num` 是不是一个无符号的整数
+        - 使用方法
+            ```sh
+            a=23
+            if Regex::IsUnsignedInt $a;then
+                echo 111
+            else
+                echo 222
+            fi
+            # echo 111
+
+            a=+23
+            if Regex::IsUnsignedInt $a;then
+                echo 111
+            else
+                echo 222
+            fi
+            # echo 222
+
+            a=-23
+            if Regex::IsUnsignedInt $a;then
+                echo 111
+            else
+                echo 222
+            fi
+            # echo 222
+            ```
 
 # 扩展工具 ext/
 
