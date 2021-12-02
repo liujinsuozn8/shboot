@@ -17,6 +17,8 @@ Properties::GetValue(){
   local IFS=' = '
   local result=''
   while read k v; do
+    v="${v//$'\r'}"
+
     if [[ -z "$k" ]] || String::StartsWith "$k" '#' || [[ -z "$v" ]]; then
       continue
     fi
@@ -45,10 +47,13 @@ Properties::GetAllKeyAndValue(){
     # k is empty
     # k StartsWith #
     # v is empty
+
+    v="${v//$'\r'}"
+
     if [[ -z "$k" ]] || String::StartsWith "$k" '#' || [[ -z "$v" ]]; then
       continue
     fi
-    
+
     result+=( "$k" "$v" )
   done < "$1"
 

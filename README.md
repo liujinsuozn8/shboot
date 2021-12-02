@@ -891,11 +891,29 @@ Log::DEBUG 'test'
         - 将 `text` 写入文件。如果文件中已经存在 `text`，则不写入
     - `File::TryAppendFileTo 'f1Path' 'f2Path'`
         - 将 `f1Path` 文件中的内容写入 `f2Path`
-
+            - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
+    - `File::FlatFile 'path' 'delimiter'`
+        - 读取文件，使用分隔符连接每一行，并返回一个字符串
+            - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
+        - 参数
+            - `$1:path`, 文件路径
+            - `$2:delimiter`, 分隔符
+        - 返回值
+            - 字符串
+        - 状态码
+            - 0: 执行结束
+            - 1: 参数数量不等于2
+            - 2: 文件不存在
+        - 使用方法
+            ```sh
+            a=$(File::FlatFile "xxx" ',')
+            echo $a
+            ```
 - `import file/properties`
     - `Properties::GetAllKeyAndValue 'filePath'`
         - 读取 properties 文件，并按顺序返回文件中的 key + value
             - 将会自动跳过 没有 key、没有 value、注释行
+            - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
         - 返回值
             - 数组字符串。如果需要使用数组，必须手动转换
         - 退出的状态码
@@ -924,6 +942,7 @@ Log::DEBUG 'test'
         - 读取 properties 文件，根据 key 查找 value。
             - 如果没有指定的 key，将会返回空字符串
             - 将会自动跳过 没有 key、没有 value、注释行
+            - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
         - 返回值
             - value 的字符串
         - 状态码

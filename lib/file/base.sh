@@ -273,6 +273,33 @@ File::TryAppendFileTo(){
   IFS=$'\n'
   local line
   for line in $(cat "$1"); do
+    line="${line//$'\r'}"
     File::TryWrite "$line" "$2"
   done
+}
+
+File::FlatFile(){
+  # Usage 
+  #   File::FlatFile 'path' 'delimiter'
+
+  if [ $# -ne 2 ]; then
+    return 1
+  fi
+
+  if [ ! -e "$1" ]; then
+    return 2
+  fi
+
+  local line
+  local result=''
+  while read line; do
+    # echo ${line//[$'trn']}
+    if [ "$result" == '' ]; then
+      result="${line//$'\r'}"
+    else
+      result="${result}$2${line//$'\r'}"
+    fi
+  done < "$1"
+
+  echo "$result"
 }
