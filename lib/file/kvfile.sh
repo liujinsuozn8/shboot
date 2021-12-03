@@ -6,8 +6,8 @@
 
 import string/base
 
-Properties::GetValue(){
-  # Usage: Properties::GetAllKeyAndValue 'filePath' 'key'
+KVFile::GetValue(){
+  # Usage: KVFile::GetAllKeyAndValue 'filePath' 'key'
   if [[ -z "$1" ]] || [[ ! -e "$1" ]] || [[ -z "$2" ]]; then
     return 1
   fi
@@ -32,8 +32,8 @@ Properties::GetValue(){
   echo "$result"
 }
 
-Properties::GetAllKeyAndValue(){
-  # Usage: Properties::GetAllKeyAndValue 'filePath'
+KVFile::GetAllKeyAndValue(){
+  # Usage: KVFile::GetAllKeyAndValue 'filePath'
   if [[ -z "$1" ]] || [[ ! -e "$1" ]]; then
     return 1
   fi

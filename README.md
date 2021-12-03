@@ -408,15 +408,15 @@ try {
 
 - 可显示的日志级别: `DEBUG`
 
-### 自动加载 log.properties 配置，并生成log输出器
+### 自动加载 log.conf 配置，并生成log输出器
 - 使用方式和 `log4j` 类似
-    1. 需要添加配置文件：`resources/log.properties`
+    1. 需要添加配置文件：`resources/log.conf`
     2. 配置log输出器，可以配置多个
     3. 在shell中调用 `Log::DEBUG` 等方法，就可以将日志输出到配置好的 log 输出器中
 
 - 配置文件的搜索过程
-    1. 优先加载与 **启动 shell** 在同级目录下的 `resources/log.properties`
-    2. 如果 1 没有找到，则使用默认的配置文件 `shboot/resources/log.properties`
+    1. 优先加载与 **启动 shell** 在同级目录下的 `resources/log.conf`
+    2. 如果 1 没有找到，则使用默认的配置文件 `shboot/resources/log.conf`
     3. 如果 2 也没有找到，将会自动加载默认的控制台log输出器
 
 - 使用方式
@@ -441,7 +441,7 @@ try {
 
 - 可显示的日志级别: `DEBUG`
 
-## log.properties 配置方法
+## log.conf 配置方法
 ### 默认log输出器的配置
 - 现在只提供三种
     1. `Console`，在控制台打印日志
@@ -909,9 +909,10 @@ Log::DEBUG 'test'
             a=$(File::FlatFile "xxx" ',')
             echo $a
             ```
-- `import file/properties`
-    - `Properties::GetAllKeyAndValue 'filePath'`
-        - 读取 properties 文件，并按顺序返回文件中的 key + value
+- `import file/kvfile`
+    - `KVFile::GetAllKeyAndValue 'filePath'`
+        - 读取内容是 `key=value` 形式的文件文件，并按顺序返回文件中的 key + value
+            - 可以处理如 `*.properties`, `*.conf` 文件
             - 将会自动跳过 没有 key、没有 value、注释行
             - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
         - 返回值
@@ -923,7 +924,7 @@ Log::DEBUG 'test'
             ```sh
             # 以数组方式使用
             # 返回的数组中，每两个为一组，第一个是 key，第二个是 value
-            kvs=( $(Properties::GetAllKeyAndValue "$1" ) )
+            kvs=( $(KVFile::GetAllKeyAndValue "$1" ) )
             for (( i=0; i<${#kvs[@]}; i++)) do
                 local k=${kvs[i]}
                 local v=${kvs[i+1]}
@@ -938,8 +939,9 @@ Log::DEBUG 'test'
                 echo "x=$x"
             done
             ```
-    - `Properties::GetValue 'filePath' 'key'`
-        - 读取 properties 文件，根据 key 查找 value。
+    - `KVFile::GetValue 'filePath' 'key'`
+        - 读取内容是 `key=value` 形式的文件，根据 key 查找 value
+            - 可以处理如 `*.properties`, `*.conf` 文件
             - 如果没有指定的 key，将会返回空字符串
             - 将会自动跳过 没有 key、没有 value、注释行
             - 可以处理 `CRLF` 结尾的文件。方法内部会自动去除`\r`
@@ -951,12 +953,12 @@ Log::DEBUG 'test'
         - 示例
             ```sh
             # 1. 能够搜索到，返回字符串
-            v=$(Properties::GetValue './resources/log.properties' 'appender.RF')
+            v=$(KVFile::GetValue './resources/log.conf' 'appender.RF')
             echo $v
             # RollingFile
 
             # 2. 不能搜索到，返回空字符
-            v=$(Properties::GetValue './resources/log.properties' 'xxxxxx')
+            v=$(KVFile::GetValue './resources/log.conf' 'xxxxxx')
             echo $v
             # 显示空
             ```

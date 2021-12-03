@@ -4,7 +4,7 @@
 # LICENSE: MIT License
 #---------------------------------------
 
-import file/properties
+import file/kvfile
 import string/base
 import array/base
 import log/base
@@ -44,7 +44,7 @@ Log::LoadPropertiesAppender(){
   # Usage: Log::LoadPropertiesAppender 'propertiesPath'
   export Log_Global_Appenders=''
 
-  local kvs=( $(Properties::GetAllKeyAndValue "$1" ) )
+  local kvs=( $(KVFile::GetAllKeyAndValue "$1" ) )
   local rootLogger=''
   local i
 
@@ -145,8 +145,8 @@ export -f Log::LoadPropertiesAppender
 ###########################
 
 Log::ReLoadAppender(){
-  # find custom log.properties
-  local customPropertiesPath="${START_SHEEL_DIR}/resources/log.properties"
+  # find custom log.conf
+  local customPropertiesPath="${START_SHEEL_DIR}/resources/log.conf"
 
   # clear other appender
   Log::ClearAllAppenders
