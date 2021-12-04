@@ -7,14 +7,13 @@ import string/regex
 
 Random::NumAndEnStr(){
   # Random::NumAndEnStr strLength
-  if [[ $# -ne 1 ]] || Regex::IsUnsignedInt "$1"; then
+  if [[ $# -ne 1 ]] || ! Regex::IsUnsignedInt $1; then
     return 1
   fi
 
   local nums="0123456789"
   local upperEN="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   local lowerEN="abcdefghijklmnopqrstuvwxyz"
-
   local i
   local result=''
   for ((i=0; i<$1; i++)); do
